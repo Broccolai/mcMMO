@@ -48,6 +48,8 @@ public final class CommandRegistrationManager {
     //TODO: Properly rewrite ACF integration later
     public void registerACFCommands() {
         //Register ACF Commands
+
+        commandManager.registerCommand(new McMMOCommand());
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -298,16 +300,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new AbilityToggleCommand(pluginRef));
     }
 
-    private void registerMcmmoCommand() {
-        PluginCommand command = pluginRef.getCommand("mcmmo");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcmmo"));
-        command.setPermission("mcmmo.commands.mcmmo.description;mcmmo.commands.mcmmo.help");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mcmmo"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcmmo", "help"));
-        command.setExecutor(new McMMOCommand(pluginRef));
-    }
-
     private void registerMcrankCommand() {
         PluginCommand command = pluginRef.getCommand("mcrank");
         command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcrank"));
@@ -479,7 +471,6 @@ public final class CommandRegistrationManager {
         registerMcabilityCommand();
         registerMcgodCommand();
         registerMcChatSpyCommand();
-        registerMcmmoCommand();
         registerMcnotifyCommand();
         registerMcrefreshCommand();
         registerMcscoreboardCommand();

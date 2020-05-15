@@ -1,61 +1,39 @@
 package com.gmail.nossr50.commands;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
 import com.gmail.nossr50.commands.party.PartySubcommandType;
 import com.gmail.nossr50.mcMMO;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class McMMOCommand implements CommandExecutor {
+@CommandAlias("mcmmo")
+public class McMMOCommand extends BaseCommand {
+    @Dependency
+    private mcMMO pluginRef;
 
-    private final mcMMO pluginRef;
+    @Default
+    @CommandPermission("mcmmo.commands.mcmmo.description")
+    public void onDefault(CommandSender sender) {
+        String[] description = pluginRef.getLocaleManager().getString("mcMMO.Description").split(",");
+        sender.sendMessage(description);
+        sender.sendMessage(pluginRef.getLocaleManager().getString("mcMMO.Description.FormerDevs"));
 
-    public McMMOCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
+        if (pluginRef.getConfigManager().getConfigAds().isShowDonationInfo()) {
+            sender.sendMessage(pluginRef.getLocaleManager().getString("MOTD.Donate"));
+            sender.sendMessage(ChatColor.GOLD + " - " + ChatColor.GREEN + "nossr50@gmail.com" + ChatColor.GOLD + " Paypal");
+        }
+
+        sender.sendMessage(pluginRef.getLocaleManager().getString("MOTD.Version", pluginRef.getDescription().getVersion()));
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        switch (args.length) {
-            case 0:
-                if (!pluginRef.getPermissionTools().mcmmoDescription(sender)) {
-                    sender.sendMessage(command.getPermissionMessage());
-                    return true;
-                }
-
-                String description = pluginRef.getLocaleManager().getString("mcMMO.Description");
-                String[] mcSplit = description.split(",");
-                sender.sendMessage(mcSplit);
-                sender.sendMessage(pluginRef.getLocaleManager().getString("mcMMO.Description.FormerDevs"));
-
-                if (pluginRef.getConfigManager().getConfigAds().isShowDonationInfo()) {
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("MOTD.Donate"));
-                    sender.sendMessage(ChatColor.GOLD + " - " + ChatColor.GREEN + "nossr50@gmail.com" + ChatColor.GOLD + " Paypal");
-                }
-
-                sender.sendMessage(pluginRef.getLocaleManager().getString("MOTD.Version", pluginRef.getDescription().getVersion()));
-
-//                mcMMO.getHolidayManager().anniversaryCheck(sender);
-                return true;
-
-            case 1:
-                if (args[0].equalsIgnoreCase("?") || args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("commands")) {
-                    if (!pluginRef.getPermissionTools().mcmmoHelp(sender)) {
-                        sender.sendMessage(command.getPermissionMessage());
-                        return true;
-                    }
-
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcc.Header"));
-                    displayGeneralCommands(sender);
-                    displayOtherCommands(sender);
-                    displayPartyCommands(sender);
-                }
-                return true;
-
-            default:
-                return false;
-        }
+    @Subcommand("help|?|commands")
+    @CommandPermission("mcmmo.commands.mcmmo.help")
+    public void onHelp(CommandSender sender) {
+        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcc.Header"));
+        displayGeneralCommands(sender);
+        displayOtherCommands(sender);
+        displayPartyCommands(sender);
     }
 
     private void displayGeneralCommands(CommandSender sender) {
