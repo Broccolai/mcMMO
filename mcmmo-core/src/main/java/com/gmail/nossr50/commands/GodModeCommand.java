@@ -1,33 +1,37 @@
 package com.gmail.nossr50.commands;
 
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Optional;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
-import com.gmail.nossr50.mcMMO;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class GodModeCommand extends ToggleCommand {
+@CommandAlias("mcgod")
+public class GodModeCommand extends McMMOBaseCommand {
+    @Default
+    @CommandCompletion("@Players")
+    public void onCommand(CommandSender sender, @Optional McMMOPlayer targetPlayer) {
+        if (targetPlayer != null) {
+            if (!pluginRef.getPermissionTools().mcgod(sender)) {
+                throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("mcMMO.NoPermission", false));
+            }
 
-    public GodModeCommand(mcMMO pluginRef) {
-        super(pluginRef);
+            toggleGodMode(targetPlayer);
+            sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.GodMode.Toggle", targetPlayer.getPlayerName()));
+        } else {
+            Player player = getSenderAsPlayer(sender);
+            checkPlayerIsLoaded(player);
+
+            McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getPlayer(sender.getName());
+            toggleGodMode(mcMMOPlayer);
+        }
     }
 
-    @Override
-    protected boolean hasOtherPermission(CommandSender sender) {
-        return pluginRef.getPermissionTools().mcgodOthers(sender);
-    }
-
-    @Override
-    protected boolean hasSelfPermission(CommandSender sender) {
-        return pluginRef.getPermissionTools().mcgod(sender);
-    }
-
-    @Override
-    protected void applyCommandAction(McMMOPlayer mcMMOPlayer) {
+    private void toggleGodMode(McMMOPlayer mcMMOPlayer) {
         mcMMOPlayer.getPlayer().sendMessage(pluginRef.getLocaleManager().getString("Commands.GodMode." + (mcMMOPlayer.getGodMode() ? "Disabled" : "Enabled")));
         mcMMOPlayer.toggleGodMode();
-    }
-
-    @Override
-    protected void sendSuccessMessage(CommandSender sender, String playerName) {
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.GodMode.Toggle", playerName));
     }
 }
