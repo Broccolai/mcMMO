@@ -1,5 +1,6 @@
 package com.gmail.nossr50.util.commands;
 
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.gmail.nossr50.commands.*;
 import com.gmail.nossr50.commands.admin.NBTToolsCommand;
@@ -20,6 +21,7 @@ import com.gmail.nossr50.commands.party.teleport.PtpCommand;
 import com.gmail.nossr50.commands.player.*;
 import com.gmail.nossr50.commands.server.ReloadPluginCommand;
 import com.gmail.nossr50.commands.skills.*;
+import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.StringUtils;
@@ -52,6 +54,26 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new McMMOCommand());
         registerNBTToolsCommand();
         registerMmoDebugCommand();
+    }
+
+    /**
+     * Register ACF Contexts
+     */
+    public void registerACFContexts() {
+        commandManager.getCommandContexts().registerOptionalContext(McMMOPlayer.class, c -> {
+            String name = c.popFirstArg();
+
+            if (name == null) return null;
+
+            String playerName = pluginRef.getCommandTools().getMatchedPlayerName(name);
+            McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getPlayer(playerName);
+
+            if (!pluginRef.getCommandTools().checkPlayerExistence(c.getIssuer().getIssuer(), playerName, mcMMOPlayer)) {
+                throw new InvalidCommandArgument();
+            }
+
+            return mcMMOPlayer;
+        });
     }
 
     /**

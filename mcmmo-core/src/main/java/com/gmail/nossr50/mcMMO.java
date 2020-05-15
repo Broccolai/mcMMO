@@ -216,6 +216,7 @@ public class mcMMO extends JavaPlugin {
 
                 scheduleTasks();
                 commandRegistrationManager = new CommandRegistrationManager(this);
+                commandRegistrationManager.registerACFContexts();
                 commandRegistrationManager.registerACFCommands();
                 commandRegistrationManager.registerCommands();
 
