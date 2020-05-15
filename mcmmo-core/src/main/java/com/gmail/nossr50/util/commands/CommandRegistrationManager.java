@@ -52,6 +52,7 @@ public final class CommandRegistrationManager {
         //Register ACF Commands
 
         commandManager.registerCommand(new McMMOCommand());
+        commandManager.registerCommand(new GodModeCommand());
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -216,15 +217,6 @@ public final class CommandRegistrationManager {
         command.setPermissionMessage(permissionsMessage);
         command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.3", "addxp", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.XP") + ">"));
         command.setExecutor(new AddXPCommand(pluginRef));
-    }
-
-    private void registerMcgodCommand() {
-        PluginCommand command = pluginRef.getCommand("mcgod");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcgod"));
-        command.setPermission("mcmmo.commands.mcgod;mcmmo.commands.mcgod.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcgod", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]"));
-        command.setExecutor(new GodModeCommand(pluginRef));
     }
 
     private void registerMmoInfoCommand() {
@@ -491,7 +483,6 @@ public final class CommandRegistrationManager {
         // Generic Commands
         registerMmoInfoCommand();
         registerMcabilityCommand();
-        registerMcgodCommand();
         registerMcChatSpyCommand();
         registerMcnotifyCommand();
         registerMcrefreshCommand();
