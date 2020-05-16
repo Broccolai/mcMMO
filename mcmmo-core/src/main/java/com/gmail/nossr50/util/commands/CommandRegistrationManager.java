@@ -60,6 +60,7 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new AbilityToggleCommand());
         commandManager.registerCommand(new GodModeCommand());
         commandManager.registerCommand(new ChatSpyCommand());
+        commandManager.registerCommand(new ChatNotificationToggleCommand());
         commandManager.registerCommand(new RefreshCooldownsCommand());
 
         registerNBTToolsCommand();
@@ -427,15 +428,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new VampirismCommand());
     }*/
 
-    private void registerMcnotifyCommand() {
-        PluginCommand command = pluginRef.getCommand("mcnotify");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcnotify"));
-        command.setPermission("mcmmo.commands.mcnotify");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mcnotify"));
-        command.setExecutor(new ChatNotificationToggleCommand(pluginRef));
-    }
-
     private void registerMHDCommand() {
         PluginCommand command = pluginRef.getCommand("mhd");
         command.setDescription("Resets all mob health bar settings for all players to the default"); //TODO: Localize
@@ -471,7 +463,7 @@ public final class CommandRegistrationManager {
 //        registerMcabilityCommand();
 //        registerMcgodCommand();
 //        registerMcChatSpyCommand();
-        registerMcnotifyCommand();
+//        registerMcnotifyCommand();
 //        registerMcrefreshCommand();
         registerMcscoreboardCommand();
         registerMHDCommand();
