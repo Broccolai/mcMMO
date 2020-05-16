@@ -153,8 +153,15 @@ public class mcMMO extends JavaPlugin {
             //Init config manager etc
             loadConfigFiles();
 
+            //Init User Manager
+            userManager = new UserManager(this);
+
             //Init Locale Manager
             localeManager = new LocaleManager(this);
+
+            //Init Command Tools
+            //TODO: Better name?
+            commandTools = new CommandTools(this);
 
             //Init Skill Tools
             skillTools = new SkillTools(this);
@@ -280,13 +287,6 @@ public class mcMMO extends JavaPlugin {
 
         //Init Event Manager
         eventManager = new EventManager(this);
-
-        //Init Command Tools
-        //TODO: Better name?
-        commandTools = new CommandTools(this);
-
-        //Init User Manager
-        userManager = new UserManager(this);
 
         //Init Scoreboard Manager
         scoreboardManager = new ScoreboardManager(this);
