@@ -218,6 +218,7 @@ public class mcMMO extends JavaPlugin {
                 commandRegistrationManager = new CommandRegistrationManager(this);
                 commandRegistrationManager.registerACFContexts();
                 commandRegistrationManager.registerACFInjections();
+                commandRegistrationManager.registerACFCompletions();
                 commandRegistrationManager.registerACFCommands();
                 commandRegistrationManager.registerCommands();
 

@@ -27,7 +27,9 @@ import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
+import com.gmail.nossr50.util.TextComponentFactory;
 import com.gmail.nossr50.util.player.UserManager;
+import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.command.PluginCommand;
 
 import java.util.ArrayList;
@@ -86,10 +88,21 @@ public final class CommandRegistrationManager {
      * Register dependencies for ACF
      */
     public void registerACFInjections() {
+        // Register Tools
         commandManager.registerDependency(CommandTools.class, pluginRef.getCommandTools());
         commandManager.registerDependency(PermissionTools.class, pluginRef.getPermissionTools());
+        commandManager.registerDependency(SkillTools.class, pluginRef.getSkillTools());
+
+        // Register Managers
         commandManager.registerDependency(UserManager.class, pluginRef.getUserManager());
         commandManager.registerDependency(LocaleManager.class, pluginRef.getLocaleManager());
+
+        // Register Factories
+        commandManager.registerDependency(TextComponentFactory.class, pluginRef.getTextComponentFactory());
+    }
+
+    public void registerACFCompletions() {
+        commandManager.getCommandCompletions().registerStaticCompletion("SubSkills", pluginRef.getSkillTools().EXACT_SUBSKILL_NAMES);
     }
 
     /**
