@@ -23,8 +23,11 @@ import com.gmail.nossr50.commands.server.ReloadPluginCommand;
 import com.gmail.nossr50.commands.skills.*;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
+import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
+import com.gmail.nossr50.util.player.UserManager;
 import org.bukkit.command.PluginCommand;
 
 import java.util.ArrayList;
@@ -49,16 +52,16 @@ public final class CommandRegistrationManager {
      */
     //TODO: Properly rewrite ACF integration later
     public void registerACFCommands() {
-        //Register ACF Commands
-
+        // Generic Commands
         commandManager.registerCommand(new McMMOCommand());
+        commandManager.registerCommand(new AbilityToggleCommand());
         commandManager.registerCommand(new GodModeCommand());
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
 
     /**
-     * Register ACF Contexts
+     * Register contexts for ACF
      */
     public void registerACFContexts() {
         commandManager.getCommandContexts().registerOptionalContext(McMMOPlayer.class, c -> {
@@ -78,6 +81,16 @@ public final class CommandRegistrationManager {
     }
 
     /**
+     * Register dependencies for ACF
+     */
+    public void registerACFInjections() {
+        commandManager.registerDependency(CommandTools.class, pluginRef.getCommandTools());
+        commandManager.registerDependency(PermissionTools.class, pluginRef.getPermissionTools());
+        commandManager.registerDependency(UserManager.class, pluginRef.getUserManager());
+        commandManager.registerDependency(LocaleManager.class, pluginRef.getLocaleManager());
+    }
+
+    /**
      * Register exception handlers for the ACF commands
      */
     //TODO: Properly rewrite ACF integration later
@@ -94,14 +107,6 @@ public final class CommandRegistrationManager {
             pluginRef.getLogger().warning("Error occurred while executing command " + command.getName());
             return false;
         });
-    }
-
-    /**
-     * Register contexts for ACF
-     */
-    //TODO: Properly rewrite ACF integration later
-    private void registerContexts() {
-
     }
 
     /**
@@ -305,15 +310,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new CooldownCommand(pluginRef));
     }
 
-    private void registerMcabilityCommand() {
-        PluginCommand command = pluginRef.getCommand("mcability");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcability"));
-        command.setPermission("mcmmo.commands.mcability;mcmmo.commands.mcability.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcability", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]"));
-        command.setExecutor(new AbilityToggleCommand(pluginRef));
-    }
-
     private void registerMcrankCommand() {
         PluginCommand command = pluginRef.getCommand("mcrank");
         command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcrank"));
@@ -482,7 +478,8 @@ public final class CommandRegistrationManager {
     public void registerCommands() {
         // Generic Commands
         registerMmoInfoCommand();
-        registerMcabilityCommand();
+//        registerMcabilityCommand();
+//        registerMcgodCommand();
         registerMcChatSpyCommand();
         registerMcnotifyCommand();
         registerMcrefreshCommand();

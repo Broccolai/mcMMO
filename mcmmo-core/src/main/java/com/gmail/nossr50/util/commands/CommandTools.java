@@ -1,5 +1,6 @@
 package com.gmail.nossr50.util.commands;
 
+import co.aikar.commands.InvalidCommandArgument;
 import com.gmail.nossr50.core.MetadataConstants;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.player.PlayerProfile;
@@ -59,6 +60,15 @@ public final class CommandTools {
         return true;
     }
 
+    // todo
+    public Player getPlayerFromSender(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("Commands.NoConsole"), false);
+        }
+
+        return (Player) sender;
+    }
+
     /**
      * Checks if there is a valid mcMMOPlayer object.
      *
@@ -107,6 +117,15 @@ public final class CommandTools {
         }
 
         return hasPlayerDataKey;
+    }
+
+    // todo
+    public void hasPlayerDataKey2(Player player) {
+        boolean hasPlayerDataKey = player.hasMetadata(MetadataConstants.PLAYER_DATA_METAKEY);
+
+        if (!hasPlayerDataKey) {
+            throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("Commands.NotLoaded"), false);
+        }
     }
 
     public boolean isLoaded(CommandSender sender, PlayerProfile profile) {
@@ -260,6 +279,10 @@ public final class CommandTools {
         }
 
         return partialName;
+    }
+
+    public void hasPermission(boolean hasPermission) {
+        if (!hasPermission) throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("mcMMO.NoPermission", false));
     }
 
     /**
