@@ -1,23 +1,19 @@
 package com.gmail.nossr50.commands;
 
+import co.aikar.commands.annotation.CommandAlias;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
-import com.gmail.nossr50.mcMMO;
 import org.bukkit.command.CommandSender;
 
-public class RefreshCooldownsCommand extends ToggleCommand {
-
-    public RefreshCooldownsCommand(mcMMO pluginRef) {
-        super(pluginRef);
-    }
-
+@CommandAlias("mcrefresh")
+public class RefreshCooldownsCommand extends ToggleCommandTODO {
     @Override
     protected boolean hasOtherPermission(CommandSender sender) {
-        return pluginRef.getPermissionTools().mcrefreshOthers(sender);
+        return permissionTools.mcrefreshOthers(sender);
     }
 
     @Override
     protected boolean hasSelfPermission(CommandSender sender) {
-        return pluginRef.getPermissionTools().mcrefresh(sender);
+        return permissionTools.mcrefresh(sender);
     }
 
     @Override
@@ -27,11 +23,11 @@ public class RefreshCooldownsCommand extends ToggleCommand {
         mcMMOPlayer.resetToolPrepMode();
         mcMMOPlayer.resetSuperAbilityMode();
 
-        mcMMOPlayer.getPlayer().sendMessage(pluginRef.getLocaleManager().getString("Ability.Generic.Refresh"));
+        mcMMOPlayer.getPlayer().sendMessage(localeManager.getString("Ability.Generic.Refresh"));
     }
 
     @Override
     protected void sendSuccessMessage(CommandSender sender, String playerName) {
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcrefresh.Success", playerName));
+        sender.sendMessage(localeManager.getString("Commands.mcrefresh.Success", playerName));
     }
 }

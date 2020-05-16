@@ -56,6 +56,8 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new McMMOCommand());
         commandManager.registerCommand(new AbilityToggleCommand());
         commandManager.registerCommand(new GodModeCommand());
+        commandManager.registerCommand(new ChatSpyCommand());
+        commandManager.registerCommand(new RefreshCooldownsCommand());
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -231,24 +233,6 @@ public final class CommandRegistrationManager {
         command.setPermissionMessage(permissionsMessage);
         command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mmoinfo", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.SubSkill") + "]"));
         command.setExecutor(new MmoInfoCommand(pluginRef));
-    }
-
-    private void registerMcChatSpyCommand() {
-        PluginCommand command = pluginRef.getCommand("mcchatspy");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcchatspy"));
-        command.setPermission("mcmmo.commands.mcchatspy;mcmmo.commands.mcchatspy.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcchatspy", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]"));
-        command.setExecutor(new ChatSpyCommand(pluginRef));
-    }
-
-    private void registerMcrefreshCommand() {
-        PluginCommand command = pluginRef.getCommand("mcrefresh");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcrefresh"));
-        command.setPermission("mcmmo.commands.mcrefresh;mcmmo.commands.mcrefresh.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcrefresh", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]"));
-        command.setExecutor(new RefreshCooldownsCommand(pluginRef));
     }
 
     private void registerMmoeditCommand() {
@@ -480,9 +464,9 @@ public final class CommandRegistrationManager {
         registerMmoInfoCommand();
 //        registerMcabilityCommand();
 //        registerMcgodCommand();
-        registerMcChatSpyCommand();
+//        registerMcChatSpyCommand();
         registerMcnotifyCommand();
-        registerMcrefreshCommand();
+//        registerMcrefreshCommand();
         registerMcscoreboardCommand();
         registerMHDCommand();
         registerXprateCommand();
