@@ -1,79 +1,44 @@
 package com.gmail.nossr50.commands;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.Optional;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
-import com.gmail.nossr50.mcMMO;
-import com.google.common.collect.ImmutableList;
-import org.bukkit.command.Command;
+import com.gmail.nossr50.locale.LocaleManager;
+import com.gmail.nossr50.util.PermissionTools;
+import com.gmail.nossr50.util.commands.CommandTools;
+import com.gmail.nossr50.util.player.UserManager;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-import org.bukkit.util.StringUtil;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+public abstract class ToggleCommand extends BaseCommand {
+    @Dependency
+    protected CommandTools commandTools;
+    @Dependency
+    protected PermissionTools permissionTools;
+    @Dependency
+    protected UserManager userManager;
+    @Dependency
+    protected LocaleManager localeManager;
 
-public abstract class ToggleCommand implements TabExecutor {
 
-    protected mcMMO pluginRef;
+    @Default
+    @CommandCompletion("@Players")
+    public void onCommand(CommandSender sender, @Optional McMMOPlayer target) {
+        if (target == null) {
+            Player player = commandTools.getPlayerFromSender(sender);
 
-    public ToggleCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-    }
+            commandTools.hasPermission(!hasSelfPermission(player));
+            commandTools.hasPlayerDataKey2(player);
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        switch (args.length) {
-            case 0:
-                if (pluginRef.getCommandTools().noConsoleUsage(sender)) {
-                    return true;
-                }
+            applyCommandAction(userManager.getPlayer(sender.getName()));
+        } else {
+            commandTools.hasPermission(!hasOtherPermission(target.getPlayer()));
 
-                if (!hasSelfPermission(sender)) {
-                    sender.sendMessage(command.getPermissionMessage());
-                    return true;
-                }
-
-                if (!pluginRef.getCommandTools().hasPlayerDataKey(sender)) {
-                    return true;
-                }
-
-                applyCommandAction(pluginRef.getUserManager().getPlayer(sender.getName()));
-                return true;
-
-            case 1:
-                if (!hasOtherPermission(sender)) {
-                    sender.sendMessage(command.getPermissionMessage());
-                    return true;
-                }
-
-                String playerName = pluginRef.getCommandTools().getMatchedPlayerName(args[0]);
-                McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getPlayer(playerName);
-
-                if (!pluginRef.getCommandTools().checkPlayerExistence(sender, playerName, mcMMOPlayer)) {
-                    return true;
-                }
-
-                //TODO: Does it matter if they are offline?
-                /*if (pluginRef.getCommandTools().isOffline(sender, mcMMOPlayer.getPlayer())) {
-                    return true;
-                }*/
-
-                applyCommandAction(mcMMOPlayer);
-                sendSuccessMessage(sender, playerName);
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                List<String> playerNames = pluginRef.getCommandTools().getOnlinePlayerNames(sender);
-                return StringUtil.copyPartialMatches(args[0], playerNames, new ArrayList<>(playerNames.size()));
-            default:
-                return ImmutableList.of();
+            applyCommandAction(target);
+            sendSuccessMessage(sender, target.getPlayerName());
         }
     }
 

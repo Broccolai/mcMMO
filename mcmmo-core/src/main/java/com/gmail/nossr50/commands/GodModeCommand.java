@@ -5,7 +5,7 @@ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 
 @CommandAlias("mcgod")
-public class GodModeCommand extends ToggleCommandTODO {
+public class GodModeCommand extends ToggleCommand {
     @Override
     protected boolean hasOtherPermission(CommandSender sender) {
         return permissionTools.mcgodOthers(sender);

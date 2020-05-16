@@ -5,7 +5,7 @@ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 
 @CommandAlias("mcrefresh")
-public class RefreshCooldownsCommand extends ToggleCommandTODO {
+public class RefreshCooldownsCommand extends ToggleCommand {
     @Override
     protected boolean hasOtherPermission(CommandSender sender) {
         return permissionTools.mcrefreshOthers(sender);
