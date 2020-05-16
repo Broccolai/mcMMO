@@ -56,10 +56,12 @@ public final class CommandRegistrationManager {
     public void registerACFCommands() {
         // Generic Commands
         commandManager.registerCommand(new McMMOCommand());
+        commandManager.registerCommand(new MmoInfoCommand());
         commandManager.registerCommand(new AbilityToggleCommand());
         commandManager.registerCommand(new GodModeCommand());
         commandManager.registerCommand(new ChatSpyCommand());
         commandManager.registerCommand(new RefreshCooldownsCommand());
+
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -237,15 +239,6 @@ public final class CommandRegistrationManager {
         command.setPermissionMessage(permissionsMessage);
         command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.3", "addxp", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.XP") + ">"));
         command.setExecutor(new AddXPCommand(pluginRef));
-    }
-
-    private void registerMmoInfoCommand() {
-        PluginCommand command = pluginRef.getCommand("mmoinfo");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mmoinfo"));
-        command.setPermission("mcmmo.commands.mmoinfo");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mmoinfo", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.SubSkill") + "]"));
-        command.setExecutor(new MmoInfoCommand(pluginRef));
     }
 
     private void registerMmoeditCommand() {
@@ -474,7 +467,7 @@ public final class CommandRegistrationManager {
 
     public void registerCommands() {
         // Generic Commands
-        registerMmoInfoCommand();
+//        registerMmoInfoCommand();
 //        registerMcabilityCommand();
 //        registerMcgodCommand();
 //        registerMcChatSpyCommand();
