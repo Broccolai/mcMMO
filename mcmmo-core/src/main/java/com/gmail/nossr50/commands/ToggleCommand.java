@@ -30,12 +30,12 @@ public abstract class ToggleCommand extends BaseCommand {
         if (target == null) {
             Player player = commandTools.getPlayerFromSender(sender);
 
-            commandTools.hasPermission(!hasSelfPermission(player));
+            commandTools.hasPermission(hasSelfPermission(player));
             commandTools.hasPlayerDataKey2(player);
 
             applyCommandAction(userManager.getPlayer(sender.getName()));
         } else {
-            commandTools.hasPermission(!hasOtherPermission(target.getPlayer()));
+            commandTools.hasPermission(hasOtherPermission(target.getPlayer()));
 
             applyCommandAction(target);
             sendSuccessMessage(sender, target.getPlayerName());
