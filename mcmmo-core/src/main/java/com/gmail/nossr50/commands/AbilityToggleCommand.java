@@ -1,10 +1,12 @@
 package com.gmail.nossr50.commands;
 
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Description;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 
 @CommandAlias("mcability")
+@Description("%description.mcgod")
 public class AbilityToggleCommand extends ToggleCommand {
     @Override
     protected boolean hasOtherPermission(CommandSender sender) {

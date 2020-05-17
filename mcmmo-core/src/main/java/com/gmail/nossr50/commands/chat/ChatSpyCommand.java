@@ -1,9 +1,13 @@
 package com.gmail.nossr50.commands.chat;
 
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Subcommand;
 import com.gmail.nossr50.commands.ToggleCommand;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 
+@Subcommand("mcchatspy")
+@Description("%description.mcchatspy")
 public class ChatSpyCommand extends ToggleCommand {
     @Override
     protected boolean hasOtherPermission(CommandSender sender) {

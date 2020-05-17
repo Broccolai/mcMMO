@@ -11,6 +11,7 @@ import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.entity.Player;
 
 @CommandAlias("mmoinfo")
+@Description("%description.mcmmo")
 public class MmoInfoCommand extends BaseCommand {
     @Dependency
     private SkillTools skillTools;

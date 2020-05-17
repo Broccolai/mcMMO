@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-//TODO: Properly rewrite ACF integration later
 public final class CommandRegistrationManager {
     private final mcMMO pluginRef;
     private String permissionsMessage;
@@ -56,18 +55,17 @@ public final class CommandRegistrationManager {
     /**
      * Register ACF Commands
      */
-    //TODO: Properly rewrite ACF integration later
     public void registerACFCommands() {
         // Generic Commands
-        commandManager.registerCommand(new McMMOCommand());
-        commandManager.registerCommand(new MmoInfoCommand());
-        commandManager.registerCommand(new AbilityToggleCommand());
-        commandManager.registerCommand(new GodModeCommand());
-        commandManager.registerCommand(new ChatSpyCommand());
-        commandManager.registerCommand(new ChatNotificationToggleCommand());
-        commandManager.registerCommand(new RefreshCooldownsCommand());
-        commandManager.registerCommand(new ScoreboardCommand());
-        commandManager.registerCommand(new ResetUserHealthBarSettingsCommand());
+        registerMcMMOCommand();
+        registerMmoInfoCommand();
+        registerAbilityToggleCommand();
+        registerGodModeCommand();
+        registerChatSpyCommand();
+        registerNotifyCommand();
+        registerRefreshCommand();
+        registerScoreboardCommand();
+        registerMHDCommand();
 
         registerNBTToolsCommand();
         registerMmoDebugCommand();
@@ -123,7 +121,6 @@ public final class CommandRegistrationManager {
     /**
      * Register exception handlers for the ACF commands
      */
-    //TODO: Properly rewrite ACF integration later
     private void registerExceptionHandlers() {
         registerDefaultExceptionHandler();
     }
@@ -131,12 +128,82 @@ public final class CommandRegistrationManager {
     /**
      * Register default exception handler
      */
-    //TODO: Properly rewrite ACF integration later
     private void registerDefaultExceptionHandler() {
         commandManager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t) -> {
             pluginRef.getLogger().warning("Error occurred while executing command " + command.getName());
             return false;
         });
+    }
+
+    /**
+     *  Register the mcMMO command
+     */
+    private void registerMcMMOCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcmmo", pluginRef.getLocaleManager().getString("Commands.Description.mcmmo"));
+        commandManager.registerCommand(new McMMOCommand());
+    }
+
+    /**
+     * Register MMO Info Command
+     */
+    private void registerMmoInfoCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mmoinfo", pluginRef.getLocaleManager().getString("Commands.Description.mmoinfo"));
+        commandManager.registerCommand(new MmoInfoCommand());
+    }
+
+    /**
+     * Register Ability Toggle Command
+     */
+    private void registerAbilityToggleCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcability", pluginRef.getLocaleManager().getString("Commands.Description.mcability"));
+        commandManager.registerCommand(new AbilityToggleCommand());
+    }
+
+    /**
+     * Register God Mode Command
+     */
+    private void registerGodModeCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcgod", pluginRef.getLocaleManager().getString("Commands.Description.mcgod"));
+        commandManager.registerCommand(new GodModeCommand());
+    }
+
+    /**
+     * Register Chat Spy Command
+     */
+    private void registerChatSpyCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcchatspy", pluginRef.getLocaleManager().getString("Commands.Description.mcchatspy"));
+        commandManager.registerCommand(new ChatSpyCommand());
+    }
+
+    /**
+     * Register Notify Command
+     */
+    private void registerNotifyCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcnotify", pluginRef.getLocaleManager().getString("Commands.Description.mcnotify"));
+        commandManager.registerCommand(new ChatNotificationToggleCommand());
+    }
+
+    /**
+     * Register Refresh Command
+     */
+    private void registerRefreshCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcrefresh", pluginRef.getLocaleManager().getString("Commands.Description.mcrefresh"));
+        commandManager.registerCommand(new RefreshCooldownsCommand());
+    }
+
+    /**
+     * Register Scoreboard Command
+     */
+    private void registerScoreboardCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcscoreboard", pluginRef.getLocaleManager().getString("Commands.Description.mcscoreboard"));
+        commandManager.registerCommand(new ScoreboardCommand());
+    }
+
+    /**
+     * Register MHD Command
+     */
+    private void registerMHDCommand() {
+        commandManager.registerCommand(new ResetUserHealthBarSettingsCommand());
     }
 
     /**

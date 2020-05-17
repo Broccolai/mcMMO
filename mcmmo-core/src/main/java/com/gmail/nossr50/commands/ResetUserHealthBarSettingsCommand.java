@@ -19,6 +19,7 @@ import java.util.List;
 
 @CommandAlias("mhd")
 @CommandPermission("mcmmo.commands.mhd")
+// TODO: Needs Localisation
 @Description("Resets all mob health bar settings for all players to the default")
 public class ResetUserHealthBarSettingsCommand extends BaseCommand {
     @Dependency

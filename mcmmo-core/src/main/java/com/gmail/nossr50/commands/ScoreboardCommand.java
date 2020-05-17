@@ -2,9 +2,7 @@ package com.gmail.nossr50.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Dependency;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import com.gmail.nossr50.commands.exceptions.CommandDisabled;
 import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
 import com.gmail.nossr50.locale.LocaleManager;
@@ -12,6 +10,8 @@ import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import org.bukkit.entity.Player;
 
 @CommandAlias("mcscoreboard")
+@CommandPermission("mcmmo.commands.mcscoreboard")
+@Description("%description.mcscoreboard")
 public class ScoreboardCommand extends BaseCommand {
     @Dependency
     private LocaleManager localeManager;

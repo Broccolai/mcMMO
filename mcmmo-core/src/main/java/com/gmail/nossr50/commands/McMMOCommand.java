@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 @CommandAlias("mcmmo")
+@Description("%description.mcmmo")
 public class McMMOCommand extends BaseCommand {
     @Dependency
     private mcMMO pluginRef;
