@@ -1,5 +1,6 @@
 package com.gmail.nossr50.util.commands;
 
+import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.gmail.nossr50.commands.*;
@@ -23,6 +24,7 @@ import com.gmail.nossr50.commands.server.ReloadPluginCommand;
 import com.gmail.nossr50.commands.skills.*;
 import com.gmail.nossr50.config.ConfigManager;
 import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
+import com.gmail.nossr50.core.DynamicSettingsManager;
 import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
@@ -31,9 +33,11 @@ import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
 import com.gmail.nossr50.util.TextComponentFactory;
+import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.SkillTools;
+import com.mojang.datafixers.Dynamic;
 import org.bukkit.command.PluginCommand;
 
 import java.util.ArrayList;
@@ -66,6 +70,7 @@ public final class CommandRegistrationManager {
         registerRefreshCommand();
         registerScoreboardCommand();
         registerMHDCommand();
+        registerXprateCommand();
 
         registerNBTToolsCommand();
         registerMmoDebugCommand();
@@ -103,9 +108,11 @@ public final class CommandRegistrationManager {
         // Register Managers
         commandManager.registerDependency(UserManager.class, pluginRef.getUserManager());
         commandManager.registerDependency(ConfigManager.class, pluginRef.getConfigManager());
+        commandManager.registerDependency(DynamicSettingsManager.class, pluginRef.getDynamicSettingsManager());
         commandManager.registerDependency(LocaleManager.class, pluginRef.getLocaleManager());
         commandManager.registerDependency(DatabaseManager.class, pluginRef.getDatabaseManager());
         commandManager.registerDependency(ScoreboardManager.class, pluginRef.getScoreboardManager());
+        commandManager.registerDependency(NotificationManager.class, pluginRef.getNotificationManager());
 
         // Register Settings
         commandManager.registerDependency(ConfigScoreboard.class, pluginRef.getScoreboardSettings());
@@ -114,8 +121,27 @@ public final class CommandRegistrationManager {
         commandManager.registerDependency(TextComponentFactory.class, pluginRef.getTextComponentFactory());
     }
 
+    /**
+     * Register Completions for ACF
+     */
     public void registerACFCompletions() {
         commandManager.getCommandCompletions().registerStaticCompletion("SubSkills", pluginRef.getSkillTools().EXACT_SUBSKILL_NAMES);
+    }
+
+    /**
+     * Register Conditions for ACF
+     */
+    public void registerACFConditions() {
+        commandManager.getCommandConditions().addCondition(Integer.class, "positive", ((context, execContext, value) -> {
+            if (value == null) {
+                return;
+            }
+
+            if (value < 0) {
+                // TODO: Probably needs to be localised
+                throw new ConditionFailedException("Input must be positive");
+            }
+        }));
     }
 
     /**
@@ -136,7 +162,7 @@ public final class CommandRegistrationManager {
     }
 
     /**
-     *  Register the mcMMO command
+     * Register the mcMMO command
      */
     private void registerMcMMOCommand() {
         commandManager.getCommandReplacements().addReplacement("description.mcmmo", pluginRef.getLocaleManager().getString("Commands.Description.mcmmo"));
@@ -204,6 +230,14 @@ public final class CommandRegistrationManager {
      */
     private void registerMHDCommand() {
         commandManager.registerCommand(new ResetUserHealthBarSettingsCommand());
+    }
+
+    /**
+     * Register Experience Rate Command
+     */
+    private void registerXprateCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.xprate", pluginRef.getLocaleManager().getString("Commands.Description.xprate"));
+        commandManager.registerCommand(new ExperienceRateCommand());
     }
 
     /**
@@ -346,20 +380,6 @@ public final class CommandRegistrationManager {
         command.setPermissionMessage(permissionsMessage);
         command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "skillreset", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">"));
         command.setExecutor(new SkillResetCommand(pluginRef));
-    }
-
-    private void registerXprateCommand() {
-        List<String> aliasList = new ArrayList<>();
-        aliasList.add("mcxprate");
-
-        PluginCommand command = pluginRef.getCommand("xprate");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.xprate"));
-        command.setPermission("mcmmo.commands.xprate;mcmmo.commands.xprate.reset;mcmmo.commands.xprate.set");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "xprate", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Rate") + ">", "<true|false>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "xprate", "reset"));
-        command.setAliases(aliasList);
-        command.setExecutor(new ExperienceRateCommand(pluginRef));
     }
 
     private void registerInspectCommand() {
@@ -526,7 +546,7 @@ public final class CommandRegistrationManager {
 //        registerMcrefreshCommand();
 //        registerMcscoreboardCommand();
 //        registerMHDCommand();
-        registerXprateCommand();
+//        registerXprateCommand();
 
         // Chat Commands
         registerPartyChatCommand();

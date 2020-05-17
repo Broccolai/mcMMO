@@ -172,6 +172,12 @@ public class mcMMO extends JavaPlugin {
             //Misc Tools Init
             miscTools = new MiscTools(this);
 
+            //Init Notification Manager
+            notificationManager = new NotificationManager(this);
+
+            //Init Scoreboard Manager
+            scoreboardManager = new ScoreboardManager(this);
+
             //Init DST
             registerDynamicSettings(); //Do this after configs are loaded
 
@@ -226,6 +232,7 @@ public class mcMMO extends JavaPlugin {
                 commandRegistrationManager.registerACFContexts();
                 commandRegistrationManager.registerACFInjections();
                 commandRegistrationManager.registerACFCompletions();
+                commandRegistrationManager.registerACFConditions();
                 commandRegistrationManager.registerACFCommands();
                 commandRegistrationManager.registerCommands();
 
@@ -276,9 +283,6 @@ public class mcMMO extends JavaPlugin {
         //Init player level values
         playerLevelTools = new PlayerLevelTools(this);
 
-        //Init Notification Manager
-        notificationManager = new NotificationManager(this);
-
         //Init Chat Manager
         chatManager = new ChatManager(this);
 
@@ -287,9 +291,6 @@ public class mcMMO extends JavaPlugin {
 
         //Init Event Manager
         eventManager = new EventManager(this);
-
-        //Init Scoreboard Manager
-        scoreboardManager = new ScoreboardManager(this);
 
         //Init Combat Tools
         combatTools = new CombatTools(this);
