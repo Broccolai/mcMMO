@@ -1,9 +1,15 @@
 package com.gmail.nossr50.commands;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
+import com.gmail.nossr50.config.ConfigManager;
+import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.database.FlatFileDatabaseManager;
 import com.gmail.nossr50.database.SQLDatabaseManager;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.commands.CommandTools;
+import com.gmail.nossr50.util.player.UserManager;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,39 +17,37 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
-public class ResetUserHealthBarSettingsCommand implements TabExecutor {
+@CommandAlias("mhd")
+@CommandPermission("mcmmo.commands.mhd")
+@Description("Resets all mob health bar settings for all players to the default")
+public class ResetUserHealthBarSettingsCommand extends BaseCommand {
+    @Dependency
+    private UserManager userManager;
+    @Dependency
+    private ConfigManager configManager;
+    @Dependency
+    private DatabaseManager databaseManager;
 
-    private final mcMMO pluginRef;
-
-    public ResetUserHealthBarSettingsCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (pluginRef.getDatabaseManager() instanceof SQLDatabaseManager) {
-            SQLDatabaseManager sqlDatabaseManager = (SQLDatabaseManager) pluginRef.getDatabaseManager();
+    @Default
+    public void onCommand(CommandSender sender) {
+        if (databaseManager instanceof SQLDatabaseManager) {
+            SQLDatabaseManager sqlDatabaseManager = (SQLDatabaseManager) databaseManager;
             sqlDatabaseManager.resetMobHealthSettings();
-            for (McMMOPlayer player : pluginRef.getUserManager().getPlayers()) {
-                player.getProfile().setMobHealthbarType(pluginRef.getConfigManager().getConfigMobs().getCombat().getHealthBars().getDisplayBarType());
-            }
-            sender.sendMessage("Mob health reset");
-            return true;
-        }
-        if (pluginRef.getDatabaseManager() instanceof FlatFileDatabaseManager) {
-            FlatFileDatabaseManager flatFileDatabaseManager = (FlatFileDatabaseManager) pluginRef.getDatabaseManager();
-            flatFileDatabaseManager.resetMobHealthSettings();
-            for (McMMOPlayer player : pluginRef.getUserManager().getPlayers()) {
-                player.getProfile().setMobHealthbarType(pluginRef.getConfigManager().getConfigMobs().getCombat().getHealthBars().getDisplayBarType());
-            }
-            sender.sendMessage("Mob health reset");
-            return true;
-        }
-        return false;
-    }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return ImmutableList.of();
+            for (McMMOPlayer player : userManager.getPlayers()) {
+                player.getProfile().setMobHealthbarType(configManager.getConfigMobs().getCombat().getHealthBars().getDisplayBarType());
+            }
+
+            sender.sendMessage("Mob health reset");
+        } else if (databaseManager instanceof FlatFileDatabaseManager) {
+            FlatFileDatabaseManager flatFileDatabaseManager = (FlatFileDatabaseManager) databaseManager;
+            flatFileDatabaseManager.resetMobHealthSettings();
+
+            for (McMMOPlayer player : userManager.getPlayers()) {
+                player.getProfile().setMobHealthbarType(configManager.getConfigMobs().getCombat().getHealthBars().getDisplayBarType());
+            }
+
+            sender.sendMessage("Mob health reset");
+        }
     }
 }

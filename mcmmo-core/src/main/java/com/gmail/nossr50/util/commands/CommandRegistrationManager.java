@@ -21,7 +21,9 @@ import com.gmail.nossr50.commands.party.teleport.PtpCommand;
 import com.gmail.nossr50.commands.player.*;
 import com.gmail.nossr50.commands.server.ReloadPluginCommand;
 import com.gmail.nossr50.commands.skills.*;
+import com.gmail.nossr50.config.ConfigManager;
 import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
+import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
@@ -65,6 +67,7 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new ChatNotificationToggleCommand());
         commandManager.registerCommand(new RefreshCooldownsCommand());
         commandManager.registerCommand(new ScoreboardCommand());
+        commandManager.registerCommand(new ResetUserHealthBarSettingsCommand());
 
         registerNBTToolsCommand();
         registerMmoDebugCommand();
@@ -101,7 +104,9 @@ public final class CommandRegistrationManager {
 
         // Register Managers
         commandManager.registerDependency(UserManager.class, pluginRef.getUserManager());
+        commandManager.registerDependency(ConfigManager.class, pluginRef.getConfigManager());
         commandManager.registerDependency(LocaleManager.class, pluginRef.getLocaleManager());
+        commandManager.registerDependency(DatabaseManager.class, pluginRef.getDatabaseManager());
         commandManager.registerDependency(ScoreboardManager.class, pluginRef.getScoreboardManager());
 
         // Register Settings
@@ -435,15 +440,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new VampirismCommand());
     }*/
 
-    private void registerMHDCommand() {
-        PluginCommand command = pluginRef.getCommand("mhd");
-        command.setDescription("Resets all mob health bar settings for all players to the default"); //TODO: Localize
-        command.setPermission("mcmmo.commands.mhd");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mhd"));
-        command.setExecutor(new ResetUserHealthBarSettingsCommand(pluginRef));
-    }
-
     private void registerReloadLocaleCommand() {
         PluginCommand command = pluginRef.getCommand("mcmmoreloadlocale");
         command.setDescription("Reloads locale"); // TODO: Localize
@@ -462,7 +458,7 @@ public final class CommandRegistrationManager {
 //        registerMcnotifyCommand();
 //        registerMcrefreshCommand();
 //        registerMcscoreboardCommand();
-        registerMHDCommand();
+//        registerMHDCommand();
         registerXprateCommand();
 
         // Chat Commands
