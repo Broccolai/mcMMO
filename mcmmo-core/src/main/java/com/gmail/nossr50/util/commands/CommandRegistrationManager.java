@@ -21,6 +21,7 @@ import com.gmail.nossr50.commands.party.teleport.PtpCommand;
 import com.gmail.nossr50.commands.player.*;
 import com.gmail.nossr50.commands.server.ReloadPluginCommand;
 import com.gmail.nossr50.commands.skills.*;
+import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
@@ -29,6 +30,7 @@ import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
 import com.gmail.nossr50.util.TextComponentFactory;
 import com.gmail.nossr50.util.player.UserManager;
+import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.command.PluginCommand;
 
@@ -62,6 +64,7 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new ChatSpyCommand());
         commandManager.registerCommand(new ChatNotificationToggleCommand());
         commandManager.registerCommand(new RefreshCooldownsCommand());
+        commandManager.registerCommand(new ScoreboardCommand());
 
         registerNBTToolsCommand();
         registerMmoDebugCommand();
@@ -99,6 +102,10 @@ public final class CommandRegistrationManager {
         // Register Managers
         commandManager.registerDependency(UserManager.class, pluginRef.getUserManager());
         commandManager.registerDependency(LocaleManager.class, pluginRef.getLocaleManager());
+        commandManager.registerDependency(ScoreboardManager.class, pluginRef.getScoreboardManager());
+
+        // Register Settings
+        commandManager.registerDependency(ConfigScoreboard.class, pluginRef.getScoreboardSettings());
 
         // Register Factories
         commandManager.registerDependency(TextComponentFactory.class, pluginRef.getTextComponentFactory());
@@ -437,17 +444,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new ResetUserHealthBarSettingsCommand(pluginRef));
     }
 
-    private void registerMcscoreboardCommand() {
-        PluginCommand command = pluginRef.getCommand("mcscoreboard");
-        command.setDescription("Change the current mcMMO scoreboard being displayed"); //TODO: Localize
-        command.setPermission("mcmmo.commands.mcscoreboard");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcscoreboard", "<CLEAR | KEEP>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcscoreboard", "time", "<seconds>"));
-        command.setExecutor(new ScoreboardCommand(pluginRef));
-    }
-
-
     private void registerReloadLocaleCommand() {
         PluginCommand command = pluginRef.getCommand("mcmmoreloadlocale");
         command.setDescription("Reloads locale"); // TODO: Localize
@@ -465,7 +461,7 @@ public final class CommandRegistrationManager {
 //        registerMcChatSpyCommand();
 //        registerMcnotifyCommand();
 //        registerMcrefreshCommand();
-        registerMcscoreboardCommand();
+//        registerMcscoreboardCommand();
         registerMHDCommand();
         registerXprateCommand();
 

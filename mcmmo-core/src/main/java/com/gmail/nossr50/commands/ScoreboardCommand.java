@@ -1,92 +1,48 @@
 package com.gmail.nossr50.commands;
 
-import com.gmail.nossr50.mcMMO;
-import com.google.common.collect.ImmutableList;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-import org.bukkit.util.StringUtil;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.Subcommand;
+import com.gmail.nossr50.commands.exceptions.CommandDisabled;
+import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
+import com.gmail.nossr50.locale.LocaleManager;
+import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+@CommandAlias("mcscoreboard")
+public class ScoreboardCommand extends BaseCommand {
+    @Dependency
+    private LocaleManager localeManager;
+    @Dependency
+    private ConfigScoreboard scoreboardSettings;
+    @Dependency
+    private ScoreboardManager scoreboardManager;
 
-public class ScoreboardCommand implements TabExecutor {
-
-    private final mcMMO pluginRef;
-
-    public ScoreboardCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
+    @Subcommand("clear|reset")
+    public void onClear(Player player) {
+        scoreboardManager.clearBoard(player.getName());
+        player.sendMessage(localeManager.getString("Commands.Scoreboard.Clear"));
     }
 
-    private static final List<String> FIRST_ARGS = ImmutableList.of("keep", "time", "clear");
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (pluginRef.getCommandTools().noConsoleUsage(sender)) {
-            return true;
+    @Subcommand("keep")
+    public void onKeep(Player player) {
+        if (!scoreboardSettings.getScoreboardsEnabled()) {
+            throw new CommandDisabled(localeManager);
         }
 
-        switch (args.length) {
-            case 1:
-                if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("reset")) {
-                    pluginRef.getScoreboardManager().clearBoard(sender.getName());
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Clear"));
-                    return true;
-                }
-
-                if (args[0].equalsIgnoreCase("keep")) {
-                    if (!pluginRef.getScoreboardSettings().getScoreboardsEnabled()) {
-                        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Disabled"));
-                        return true;
-                    }
-
-                    if (!pluginRef.getScoreboardManager().isBoardShown(sender.getName())) {
-                        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.NoBoard"));
-                        return true;
-                    }
-
-                    pluginRef.getScoreboardManager().keepBoard(sender.getName());
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Keep"));
-                    return true;
-                }
-
-                return help(sender);
-
-            case 2:
-                if (args[0].equalsIgnoreCase("time") || args[0].equalsIgnoreCase("timer")) {
-                    if (pluginRef.getCommandTools().isInvalidInteger(sender, args[1])) {
-                        return true;
-                    }
-
-                    int time = Math.abs(Integer.parseInt(args[1]));
-
-                    pluginRef.getScoreboardManager().setRevertTimer(sender.getName(), time);
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Timer", time));
-                    return true;
-                }
-
-                return help(sender);
-
-            default:
-                return help(sender);
+        if (!scoreboardManager.isBoardShown(player.getName())) {
+            throw new InvalidCommandArgument(localeManager.getString("Commands.Scoreboard.NoBoard"));
         }
+
+        scoreboardManager.keepBoard(player.getName());
+        player.sendMessage(localeManager.getString("Commands.Scoreboard.Keep"));
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                return StringUtil.copyPartialMatches(args[0], FIRST_ARGS, new ArrayList<>(FIRST_ARGS.size()));
-            default:
-                return ImmutableList.of();
-        }
-    }
-
-    private boolean help(CommandSender sender) {
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Help.0"));
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Help.1"));
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Help.2"));
-        sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Scoreboard.Help.3"));
-        return true;
+    @Subcommand("timer|time")
+    public void onTimer(Player player, Integer time) {
+        scoreboardManager.setRevertTimer(player.getName(), time);
+        player.sendMessage(localeManager.getString("Commands.Scoreboard.Timer", time));
     }
 }
