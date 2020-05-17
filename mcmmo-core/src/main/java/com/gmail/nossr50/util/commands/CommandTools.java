@@ -1,6 +1,9 @@
 package com.gmail.nossr50.util.commands;
 
 import co.aikar.commands.InvalidCommandArgument;
+import com.gmail.nossr50.commands.exceptions.InvalidCommandPermissions;
+import com.gmail.nossr50.commands.exceptions.InvalidCommandSender;
+import com.gmail.nossr50.commands.exceptions.ProfileNotLoaded;
 import com.gmail.nossr50.core.MetadataConstants;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.player.PlayerProfile;
@@ -63,7 +66,7 @@ public final class CommandTools {
     // todo
     public Player getPlayerFromSender(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("Commands.NoConsole"), false);
+            throw new InvalidCommandSender(pluginRef.getLocaleManager());
         }
 
         return (Player) sender;
@@ -124,7 +127,7 @@ public final class CommandTools {
         boolean hasPlayerDataKey = player.hasMetadata(MetadataConstants.PLAYER_DATA_METAKEY);
 
         if (!hasPlayerDataKey) {
-            throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("Commands.NotLoaded"), false);
+            throw new ProfileNotLoaded(pluginRef.getLocaleManager());
         }
     }
 
@@ -282,7 +285,7 @@ public final class CommandTools {
     }
 
     public void hasPermission(boolean hasPermission) {
-        if (!hasPermission) throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("mcMMO.NoPermission", false));
+        if (!hasPermission) throw new InvalidCommandPermissions(pluginRef.getLocaleManager());
     }
 
     /**

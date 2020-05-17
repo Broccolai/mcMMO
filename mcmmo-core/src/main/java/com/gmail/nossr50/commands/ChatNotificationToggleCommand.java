@@ -5,6 +5,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
+import com.gmail.nossr50.commands.exceptions.ProfilePendingLoad;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.util.player.UserManager;
@@ -23,7 +24,7 @@ public class ChatNotificationToggleCommand extends BaseCommand {
 
         //Not Loaded yet
         if (mcMMOPlayer == null) {
-            throw new InvalidCommandArgument(localeManager.getString("Profile.PendingLoad"));
+            throw new ProfilePendingLoad(localeManager);
         }
 
         player.sendMessage(localeManager.getString("Commands.Notifications." + (mcMMOPlayer.useChatNotifications() ? "Off" : "On")));

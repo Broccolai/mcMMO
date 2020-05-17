@@ -23,7 +23,6 @@ public abstract class ToggleCommand extends BaseCommand {
     @Dependency
     protected LocaleManager localeManager;
 
-
     @Default
     @CommandCompletion("@Players")
     public void onCommand(CommandSender sender, @Optional McMMOPlayer target) {
