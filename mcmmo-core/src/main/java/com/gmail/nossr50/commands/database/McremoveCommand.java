@@ -1,8 +1,16 @@
 package com.gmail.nossr50.commands.database;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
+import com.gmail.nossr50.commands.exceptions.ProfileNotLoaded;
+import com.gmail.nossr50.database.DatabaseManager;
+import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.commands.CommandTools;
+import com.gmail.nossr50.util.player.UserManager;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -12,48 +20,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class McremoveCommand implements TabExecutor {
+@CommandAlias("mcremove")
+@CommandPermission("mcmmo.commands.mcremove")
+@Description("%description.mcremove")
+public class McremoveCommand extends BaseCommand {
+    @Dependency
+    private mcMMO pluginRef;
+    @Dependency
+    private CommandTools commandTools;
+    @Dependency
+    private LocaleManager localeManager;
+    @Dependency
+    private DatabaseManager databaseManager;
 
-    private final mcMMO pluginRef;
-
-    public McremoveCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1) {
-            String playerName = pluginRef.getCommandTools().getMatchedPlayerName(args[0]);
-
-            if (pluginRef.getUserManager().getOfflinePlayer(playerName) == null && pluginRef.getCommandTools().unloadedProfile(sender, pluginRef.getDatabaseManager().loadPlayerProfile(playerName, false))) {
-                return true;
-            }
-
-            UUID uuid = null;
-
-            if (Bukkit.getPlayer(playerName) != null) {
-                uuid = Bukkit.getPlayer(playerName).getUniqueId();
-            }
-
-            if (pluginRef.getDatabaseManager().removeUser(playerName, uuid)) {
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcremove.Success", playerName));
-            } else {
-                sender.sendMessage(playerName + " could not be removed from the database."); // Pretty sure this should NEVER happen.
-            }
-
-            return true;
+    @Default
+    @CommandCompletion("@Players")
+    public void onCommand(CommandSender sender, OfflinePlayer offlinePlayer) {
+        if (commandTools.unloadedProfile(sender, pluginRef.getDatabaseManager().loadPlayerProfile(offlinePlayer.getName(), offlinePlayer.getUniqueId(), false))) {
+            throw new ProfileNotLoaded(localeManager);
         }
-        return false;
-    }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                List<String> playerNames = pluginRef.getCommandTools().getOnlinePlayerNames(sender);
-                return StringUtil.copyPartialMatches(args[0], playerNames, new ArrayList<>(playerNames.size()));
-            default:
-                return ImmutableList.of();
+        if (databaseManager.removeUser(offlinePlayer.getName(), offlinePlayer.getUniqueId())) {
+            sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcremove.Success", offlinePlayer.getName()));
+        } else {
+            sender.sendMessage(offlinePlayer.getName() + " could not be removed from the database."); // Pretty sure this should NEVER happen.
         }
     }
 }

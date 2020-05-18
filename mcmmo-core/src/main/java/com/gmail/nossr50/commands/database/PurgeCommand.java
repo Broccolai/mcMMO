@@ -1,5 +1,9 @@
 package com.gmail.nossr50.commands.database;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
+import com.gmail.nossr50.database.DatabaseManager;
+import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.command.Command;
@@ -8,34 +12,25 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
-public class PurgeCommand implements TabExecutor {
+@CommandAlias("mcpurge")
+@CommandPermission("mcmmo.commands.mcpurge")
+@Description("%description.mcpurge")
+public class PurgeCommand extends BaseCommand {
+    @Dependency
+    private mcMMO pluginRef;
+    @Dependency
+    private LocaleManager localeManager;
+    @Dependency
+    private DatabaseManager databaseManager;
 
-    private final mcMMO pluginRef;
+    @Default
+    public void onCommand(CommandSender sender) {
+        databaseManager.purgePowerlessUsers();
 
-    public PurgeCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        switch (args.length) {
-            case 0:
-                pluginRef.getDatabaseManager().purgePowerlessUsers();
-
-                if (pluginRef.getDatabaseCleaningSettings().getOldUserCutoffMonths() != -1) {
-                    pluginRef.getDatabaseManager().purgeOldUsers();
-                }
-
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.mcpurge.Success"));
-                return true;
-
-            default:
-                return false;
+        if (pluginRef.getDatabaseCleaningSettings().getOldUserCutoffMonths() != -1) {
+            databaseManager.purgeOldUsers();
         }
-    }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return ImmutableList.of();
+        sender.sendMessage(localeManager.getString("Commands.mcpurge.Success"));
     }
 }

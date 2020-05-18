@@ -72,6 +72,12 @@ public final class CommandRegistrationManager {
         registerMHDCommand();
         registerXprateCommand();
 
+        // Database Commands
+        registerMcpurgeCommand();
+        registerMcremoveCommand();
+        registerMmoshowdbCommand();
+        registerMcconvertCommand();
+
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -238,6 +244,46 @@ public final class CommandRegistrationManager {
     private void registerXprateCommand() {
         commandManager.getCommandReplacements().addReplacement("description.xprate", pluginRef.getLocaleManager().getString("Commands.Description.xprate"));
         commandManager.registerCommand(new ExperienceRateCommand());
+    }
+
+    /**
+     * Register Purge Command
+     */
+    private void registerMcpurgeCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcpurge", pluginRef.getLocaleManager().getString("Commands.Description.mcpurge"));
+        commandManager.registerCommand(new PurgeCommand());
+    }
+
+    /**
+     * Register Remove Command
+     */
+    private void registerMcremoveCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcremove", pluginRef.getLocaleManager().getString("Commands.Description.mcremove"));
+        commandManager.registerCommand(new McremoveCommand());
+    }
+
+    /**
+     * Register Show Db Command
+     */
+    private void registerMmoshowdbCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mmoshowdb", pluginRef.getLocaleManager().getString("Commands.Description.mmoshowdb"));
+        commandManager.registerCommand(new ShowDatabaseCommand());
+    }
+
+    /**
+     * Register Convert Command
+     */
+    private void registerMcconvertCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcconvert", pluginRef.getLocaleManager().getString("Commands.Description.mcconvert"));
+        commandManager.registerCommand(new ConvertCommand());
+
+        PluginCommand command = pluginRef.getCommand("mcconvert");
+        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcconvert"));
+        command.setPermission("mcmmo.commands.mcconvert;mcmmo.commands.mcconvert.experience;mcmmo.commands.mcconvert.database");
+        command.setPermissionMessage(permissionsMessage);
+        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "database", "<flatfile|sql>"));
+        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "experience", "<linear|exponential>"));
+        command.setExecutor(new ConvertCommand(pluginRef));
     }
 
     /**
@@ -427,43 +473,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new LeaderboardCommand(pluginRef));
     }
 
-    private void registerMcpurgeCommand() {
-        PluginCommand command = pluginRef.getCommand("mcpurge");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcpurge", pluginRef.getDatabaseCleaningSettings().getOldUserCutoffMonths()));
-        command.setPermission("mcmmo.commands.mcpurge");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mcpurge"));
-        command.setExecutor(new PurgeCommand(pluginRef));
-    }
-
-    private void registerMcremoveCommand() {
-        PluginCommand command = pluginRef.getCommand("mcremove");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcremove"));
-        command.setPermission("mcmmo.commands.mcremove");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.1", "mcremove", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + ">"));
-        command.setExecutor(new McremoveCommand(pluginRef));
-    }
-
-    private void registerMmoshowdbCommand() {
-        PluginCommand command = pluginRef.getCommand("mmoshowdb");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mmoshowdb"));
-        command.setPermission("mcmmo.commands.mmoshowdb");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mmoshowdb"));
-        command.setExecutor(new ShowDatabaseCommand(pluginRef));
-    }
-
-    private void registerMcconvertCommand() {
-        PluginCommand command = pluginRef.getCommand("mcconvert");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcconvert"));
-        command.setPermission("mcmmo.commands.mcconvert;mcmmo.commands.mcconvert.experience;mcmmo.commands.mcconvert.database");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "database", "<flatfile|sql>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "experience", "<linear|exponential>"));
-        command.setExecutor(new ConvertCommand(pluginRef));
-    }
-
     private void registerAdminChatCommand() {
         PluginCommand command = pluginRef.getCommand("adminchat");
         command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.adminchat"));
@@ -551,12 +560,6 @@ public final class CommandRegistrationManager {
         // Chat Commands
         registerPartyChatCommand();
         registerAdminChatCommand();
-
-        // Database Commands
-        registerMcpurgeCommand();
-        registerMcremoveCommand();
-        registerMmoshowdbCommand();
-        registerMcconvertCommand();
 
         // Experience Commands
         registerAddlevelsCommand();
