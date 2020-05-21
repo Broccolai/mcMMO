@@ -32,6 +32,8 @@ import java.util.List;
 @Description("%description.mcconvert")
 public class ConvertCommand extends BaseCommand {
     @Dependency
+    private mcMMO pluginRef;
+    @Dependency
     private DatabaseManager databaseManager;
     @Dependency
     private UserManager userManager;
@@ -40,61 +42,12 @@ public class ConvertCommand extends BaseCommand {
     @Dependency
     private LocaleManager localeManager;
 
-    private List<String> FORMULA_TYPES;
-    private List<String> DATABASE_TYPES;
-    private final List<String> CONVERSION_SUBCOMMANDS = ImmutableList.of("database", "experience");
-    private CommandExecutor databaseConvertCommand;
-    private CommandExecutor experienceConvertCommand;
-
-    private final mcMMO pluginRef;
-
-    public ConvertCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-        initTypes();
-    }
-
-    private void initTypes() {
-        ArrayList<String> formulaTypes = new ArrayList<>();
-        ArrayList<String> databaseTypes = new ArrayList<>();
-
-        for (FormulaType type : FormulaType.values()) {
-            formulaTypes.add(type.toString());
-        }
-
-        for (DatabaseType type : DatabaseType.values()) {
-            databaseTypes.add(type.toString());
-        }
-
-        // Custom stuff
-        databaseTypes.remove(DatabaseType.CUSTOM.toString());
-
-        if (databaseManager.getDatabaseType() == DatabaseType.CUSTOM) {
-            databaseTypes.add(pluginRef.getDatabaseManagerFactory().getCustomDatabaseManagerClass().getName());
-        }
-
-        Collections.sort(formulaTypes);
-        Collections.sort(databaseTypes);
-
-        FORMULA_TYPES = ImmutableList.copyOf(formulaTypes);
-        DATABASE_TYPES = ImmutableList.copyOf(databaseTypes);
-    }
-
-    @Default
-    public void onCommand(CommandSender sender, String newSystem, @Single String oldSystem) {
-        if (newSystem.equalsIgnoreCase("database") || newSystem.equalsIgnoreCase("db")) {
-            databaseConvert(sender, oldSystem);
-        } else if (newSystem.equalsIgnoreCase("experience") || newSystem.equalsIgnoreCase("xp") || oldSystem.equalsIgnoreCase("exp")) {
-            experienceConvert(sender, oldSystem);
-        } else {
-            throw new InvalidCommandArgument();
-        }
-    }
-
-    private void databaseConvert(CommandSender sender, @Single String oldSystem) {
-        DatabaseType previousType = getDatabaseType(oldSystem);
+    @Subcommand("database|db")
+    public void databaseConvert(CommandSender sender, @Single String type) {
+        DatabaseType previousType = getDatabaseType(type);
         DatabaseType newType = databaseManager.getDatabaseType();
 
-        if (previousType == newType || (newType == DatabaseType.CUSTOM && pluginRef.getDatabaseManagerFactory().getCustomDatabaseManagerClass().getSimpleName().equalsIgnoreCase(oldSystem))) {
+        if (previousType == newType || (newType == DatabaseType.CUSTOM && pluginRef.getDatabaseManagerFactory().getCustomDatabaseManagerClass().getSimpleName().equalsIgnoreCase(type))) {
             throw new InvalidCommandArgument(localeManager.getString("Commands.mcconvert.Database.Same", newType.toString()));
         }
 
@@ -104,16 +57,16 @@ public class ConvertCommand extends BaseCommand {
             Class<?> clazz;
 
             try {
-                clazz = Class.forName(oldSystem);
+                clazz = Class.forName(type);
 
                 if (!DatabaseManager.class.isAssignableFrom(clazz)) {
-                    throw new InvalidCommandArgument(localeManager.getString("Commands.mcconvert.Database.InvalidType", oldSystem));
+                    throw new InvalidCommandArgument(localeManager.getString("Commands.mcconvert.Database.InvalidType", type));
                 }
 
                 oldDatabase = pluginRef.getDatabaseManagerFactory().createCustomDatabaseManager((Class<? extends DatabaseManager>) clazz);
             } catch (Throwable e) {
                 e.printStackTrace();
-                sender.sendMessage(localeManager.getString("Commands.mcconvert.Database.InvalidType", oldSystem));
+                sender.sendMessage(localeManager.getString("Commands.mcconvert.Database.InvalidType", type));
                 return;
             }
         }
@@ -136,9 +89,10 @@ public class ConvertCommand extends BaseCommand {
         new DatabaseConversionTask(pluginRef, oldDatabase, sender, previousType.toString(), newType.toString()).runTaskAsynchronously(pluginRef);
     }
 
-    private void experienceConvert(CommandSender sender, @Single String oldSystem) {
+    @Subcommand("experience|xp")
+    public void experienceConvert(CommandSender sender, @Single String type) {
         for(FormulaType formulaType : FormulaType.values()) {
-            if(formulaType.toString().equalsIgnoreCase(oldSystem)) {
+            if(formulaType.toString().equalsIgnoreCase(type)) {
                 sender.sendMessage(localeManager.getString("Commands.mcconvert.Experience.Start", formulaType.toString(), configManager.getConfigLeveling().getFormulaType().toString()));
 
                 userManager.saveAll();
@@ -169,25 +123,5 @@ public class ConvertCommand extends BaseCommand {
         }
 
         return DatabaseType.CUSTOM;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                return StringUtil.copyPartialMatches(args[0], CONVERSION_SUBCOMMANDS, new ArrayList<>(CONVERSION_SUBCOMMANDS.size()));
-            case 2:
-                if (args[1].equalsIgnoreCase("database") || args[1].equalsIgnoreCase("db")) {
-                    return StringUtil.copyPartialMatches(args[0], DATABASE_TYPES, new ArrayList<>(DATABASE_TYPES.size()));
-                }
-
-                if (args[1].equalsIgnoreCase("experience") || args[1].equalsIgnoreCase("xp") || args[1].equalsIgnoreCase("exp")) {
-                    return StringUtil.copyPartialMatches(args[0], FORMULA_TYPES, new ArrayList<>(FORMULA_TYPES.size()));
-                }
-
-                return ImmutableList.of();
-            default:
-                return ImmutableList.of();
-        }
     }
 }

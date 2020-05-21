@@ -26,6 +26,8 @@ import com.gmail.nossr50.config.ConfigManager;
 import com.gmail.nossr50.config.scoreboard.ConfigScoreboard;
 import com.gmail.nossr50.core.DynamicSettingsManager;
 import com.gmail.nossr50.database.DatabaseManager;
+import com.gmail.nossr50.datatypes.database.DatabaseType;
+import com.gmail.nossr50.datatypes.experience.FormulaType;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
@@ -37,12 +39,11 @@ import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.SkillTools;
-import com.mojang.datafixers.Dynamic;
 import org.bukkit.command.PluginCommand;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public final class CommandRegistrationManager {
     private final mcMMO pluginRef;
@@ -132,6 +133,32 @@ public final class CommandRegistrationManager {
      */
     public void registerACFCompletions() {
         commandManager.getCommandCompletions().registerStaticCompletion("SubSkills", pluginRef.getSkillTools().EXACT_SUBSKILL_NAMES);
+
+        // TODO: Could be condensed into a stream?
+        ArrayList<String> formulaTypes = new ArrayList<>();
+
+        for (FormulaType formulaType : FormulaType.values()) {
+            formulaTypes.add(formulaType.toString());
+        }
+
+        commandManager.getCommandCompletions().registerStaticCompletion("FormulaTypes", formulaTypes);
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("DatabaseTypes", context -> {
+            ArrayList<String> completions = new ArrayList<>();
+            DatabaseType[] databaseTypes = DatabaseType.values();
+
+            for (DatabaseType databaseType : databaseTypes) {
+                completions.add(databaseType.toString());
+            }
+
+            completions.remove(DatabaseType.CUSTOM.toString());
+
+            if (pluginRef.getDatabaseManager().getDatabaseType() == DatabaseType.CUSTOM) {
+                completions.add(pluginRef.getDatabaseManagerFactory().getCustomDatabaseManagerClass().getName());
+            }
+
+            return completions;
+        });
     }
 
     /**
@@ -276,20 +303,11 @@ public final class CommandRegistrationManager {
     private void registerMcconvertCommand() {
         commandManager.getCommandReplacements().addReplacement("description.mcconvert", pluginRef.getLocaleManager().getString("Commands.Description.mcconvert"));
         commandManager.registerCommand(new ConvertCommand());
-
-        PluginCommand command = pluginRef.getCommand("mcconvert");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcconvert"));
-        command.setPermission("mcmmo.commands.mcconvert;mcmmo.commands.mcconvert.experience;mcmmo.commands.mcconvert.database");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "database", "<flatfile|sql>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.2", "mcconvert", "experience", "<linear|exponential>"));
-        command.setExecutor(new ConvertCommand(pluginRef));
     }
 
     /**
      * Register the NBT Tools command
      */
-    //TODO: Properly rewrite ACF integration later
     private void registerNBTToolsCommand() {
         commandManager.registerCommand(new NBTToolsCommand());
     }
@@ -297,7 +315,6 @@ public final class CommandRegistrationManager {
     /**
      * Register the MMO Debug command
      */
-    //TODO: Properly rewrite ACF integration later
     private void registerMmoDebugCommand() {
         commandManager.registerCommand(new PlayerDebugCommand());
     }
@@ -546,17 +563,6 @@ public final class CommandRegistrationManager {
     }
 
     public void registerCommands() {
-        // Generic Commands
-//        registerMmoInfoCommand();
-//        registerMcabilityCommand();
-//        registerMcgodCommand();
-//        registerMcChatSpyCommand();
-//        registerMcnotifyCommand();
-//        registerMcrefreshCommand();
-//        registerMcscoreboardCommand();
-//        registerMHDCommand();
-//        registerXprateCommand();
-
         // Chat Commands
         registerPartyChatCommand();
         registerAdminChatCommand();
