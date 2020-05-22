@@ -1,37 +1,30 @@
 package com.gmail.nossr50.commands.experience;
 
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Description;
 import com.gmail.nossr50.datatypes.experience.XPGainReason;
 import com.gmail.nossr50.datatypes.experience.XPGainSource;
 import com.gmail.nossr50.datatypes.player.PlayerProfile;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
-import com.gmail.nossr50.mcMMO;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@CommandAlias("addxp")
+@Description("%description.addxp")
 public class AddXPCommand extends ExperienceCommand {
-
-    public AddXPCommand(mcMMO pluginRef) {
-        super(pluginRef);
-    }
-
     @Override
-    protected boolean permissionsCheckSelf(CommandSender sender) {
-        return pluginRef.getPermissionTools().addxp(sender);
-    }
-
-    @Override
-    protected boolean permissionsCheckOthers(CommandSender sender) {
-        return pluginRef.getPermissionTools().addxpOthers(sender);
+    protected boolean permissionsCheck(CommandSender sender) {
+        return permissionTools.addxpOthers(sender);
     }
 
     @Override
     protected void handleCommand(Player player, PlayerProfile profile, PrimarySkillType skill, int value) {
         if (player != null) {
             //Check if player profile is loaded
-            if (pluginRef.getUserManager().getPlayer(player) == null)
+            if (userManager.getPlayer(player) == null)
                 return;
 
-            pluginRef.getUserManager().getPlayer(player).applyXpGain(skill, value, XPGainReason.COMMAND, XPGainSource.COMMAND);
+            userManager.getPlayer(player).applyXpGain(skill, value, XPGainReason.COMMAND, XPGainSource.COMMAND);
         } else {
             profile.addXp(skill, value);
             profile.scheduleAsyncSave();
@@ -40,11 +33,11 @@ public class AddXPCommand extends ExperienceCommand {
 
     @Override
     protected void handlePlayerMessageAll(Player player, int value) {
-        player.sendMessage(pluginRef.getLocaleManager().getString("Commands.addxp.AwardAll", value));
+        player.sendMessage(localeManager.getString("Commands.addxp.AwardAll", value));
     }
 
     @Override
     protected void handlePlayerMessageSkill(Player player, int value, PrimarySkillType skill) {
-        player.sendMessage(pluginRef.getLocaleManager().getString("Commands.addxp.AwardSkill", value, pluginRef.getSkillTools().getLocalizedSkillName(skill)));
+        player.sendMessage(localeManager.getString("Commands.addxp.AwardSkill", value, skillTools.getLocalizedSkillName(skill)));
     }
 }

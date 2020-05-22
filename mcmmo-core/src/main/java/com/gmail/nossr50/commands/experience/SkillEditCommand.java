@@ -1,25 +1,19 @@
 package com.gmail.nossr50.commands.experience;
 
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Description;
 import com.gmail.nossr50.datatypes.experience.XPGainReason;
 import com.gmail.nossr50.datatypes.player.PlayerProfile;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
-import com.gmail.nossr50.mcMMO;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@CommandAlias("mmoedit")
+@Description("%description.mmoedit")
 public class SkillEditCommand extends ExperienceCommand {
-    public SkillEditCommand(mcMMO pluginRef) {
-        super(pluginRef);
-    }
-
     @Override
-    protected boolean permissionsCheckSelf(CommandSender sender) {
-        return pluginRef.getPermissionTools().mmoedit(sender);
-    }
-
-    @Override
-    protected boolean permissionsCheckOthers(CommandSender sender) {
-        return pluginRef.getPermissionTools().mmoeditOthers(sender);
+    protected boolean permissionsCheck(CommandSender sender) {
+        return permissionTools.mmoeditOthers(sender);
     }
 
     @Override
@@ -38,16 +32,16 @@ public class SkillEditCommand extends ExperienceCommand {
             return;
         }
 
-        pluginRef.getEventManager().tryLevelEditEvent(player, skill, value, xpRemoved, value > skillLevel, XPGainReason.COMMAND, skillLevel);
+        eventManager.tryLevelEditEvent(player, skill, value, xpRemoved, value > skillLevel, XPGainReason.COMMAND, skillLevel);
     }
 
     @Override
     protected void handlePlayerMessageAll(Player player, int value) {
-        player.sendMessage(pluginRef.getLocaleManager().getString("Commands.mmoedit.AllSkills.1", value));
+        player.sendMessage(localeManager.getString("Commands.mmoedit.AllSkills.1", value));
     }
 
     @Override
     protected void handlePlayerMessageSkill(Player player, int value, PrimarySkillType skill) {
-        player.sendMessage(pluginRef.getLocaleManager().getString("Commands.mmoedit.Modified.1", pluginRef.getSkillTools().getLocalizedSkillName(skill), value));
+        player.sendMessage(localeManager.getString("Commands.mmoedit.Modified.1", skillTools.getLocalizedSkillName(skill), value));
     }
 }

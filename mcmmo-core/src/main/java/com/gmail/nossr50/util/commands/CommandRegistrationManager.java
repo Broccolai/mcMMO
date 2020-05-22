@@ -1,8 +1,6 @@
 package com.gmail.nossr50.util.commands;
 
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.*;
 import com.gmail.nossr50.commands.*;
 import com.gmail.nossr50.commands.admin.NBTToolsCommand;
 import com.gmail.nossr50.commands.admin.PlayerDebugCommand;
@@ -32,6 +30,7 @@ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.EventManager;
 import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
 import com.gmail.nossr50.util.TextComponentFactory;
@@ -43,7 +42,6 @@ import org.bukkit.command.PluginCommand;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public final class CommandRegistrationManager {
     private final mcMMO pluginRef;
@@ -79,6 +77,12 @@ public final class CommandRegistrationManager {
         registerMmoshowdbCommand();
         registerMcconvertCommand();
 
+        // Experience Commands
+        registerAddlevelsCommand();
+        registerAddxpCommand();
+        registerMmoeditCommand();
+        registerSkillresetCommand();
+
         registerNBTToolsCommand();
         registerMmoDebugCommand();
     }
@@ -90,8 +94,6 @@ public final class CommandRegistrationManager {
         commandManager.getCommandContexts().registerOptionalContext(McMMOPlayer.class, c -> {
             String name = c.popFirstArg();
 
-            if (name == null) return null;
-
             String playerName = pluginRef.getCommandTools().getMatchedPlayerName(name);
             McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getPlayer(playerName);
 
@@ -100,6 +102,16 @@ public final class CommandRegistrationManager {
             }
 
             return mcMMOPlayer;
+        });
+
+        commandManager.getCommandContexts().registerContext(PrimarySkillType.class, c -> {
+            String input = c.popFirstArg();
+
+            if (!input.equalsIgnoreCase("all")) {
+                pluginRef.getCommandTools().checkForInvalidSkill(input);
+            }
+
+            return pluginRef.getSkillTools().matchSkill(c.popFirstArg());
         });
     }
 
@@ -120,6 +132,7 @@ public final class CommandRegistrationManager {
         commandManager.registerDependency(DatabaseManager.class, pluginRef.getDatabaseManager());
         commandManager.registerDependency(ScoreboardManager.class, pluginRef.getScoreboardManager());
         commandManager.registerDependency(NotificationManager.class, pluginRef.getNotificationManager());
+        commandManager.registerDependency(EventManager.class, pluginRef.getEventManager());
 
         // Register Settings
         commandManager.registerDependency(ConfigScoreboard.class, pluginRef.getScoreboardSettings());
@@ -132,6 +145,8 @@ public final class CommandRegistrationManager {
      * Register Completions for ACF
      */
     public void registerACFCompletions() {
+        commandManager.getCommandCompletions().registerStaticCompletion("Skills", pluginRef.getSkillTools().LOCALIZED_SKILL_NAMES);
+
         commandManager.getCommandCompletions().registerStaticCompletion("SubSkills", pluginRef.getSkillTools().EXACT_SUBSKILL_NAMES);
 
         // TODO: Could be condensed into a stream?
@@ -306,6 +321,38 @@ public final class CommandRegistrationManager {
     }
 
     /**
+     * Register Add Level Command
+     */
+    private void registerAddlevelsCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.addlevels", pluginRef.getLocaleManager().getString("Commands.Description.addlevels"));
+        commandManager.registerCommand(new AddLevelsCommand());
+    }
+
+    /**
+     * Register Add Xp Command
+     */
+    private void registerAddxpCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.addxp", pluginRef.getLocaleManager().getString("Commands.Description.addxp"));
+        commandManager.registerCommand(new AddXPCommand());
+    }
+
+    /**
+     * Register MMO Edit Command
+     */
+    private void registerMmoeditCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mmoedit", pluginRef.getLocaleManager().getString("Commands.Description.mmoedit"));
+        commandManager.registerCommand(new SkillEditCommand());
+    }
+
+    /**
+     * Register Reload Command
+     */
+    private void registerMcmmoReloadCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.mcmmoreload", pluginRef.getLocaleManager().getString("Commands.Description.mcmmoreload"));
+        commandManager.registerCommand(new ReloadPluginCommand());
+    }
+
+    /**
      * Register the NBT Tools command
      */
     private void registerNBTToolsCommand() {
@@ -398,42 +445,6 @@ public final class CommandRegistrationManager {
                     break;
             }
         }
-    }
-
-    private void registerAddlevelsCommand() {
-        PluginCommand command = pluginRef.getCommand("addlevels");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.addlevels"));
-        command.setPermission("mcmmo.commands.addlevels;mcmmo.commands.addlevels.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.3", "addlevels", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Level") + ">"));
-        command.setExecutor(new AddLevelsCommand(pluginRef));
-    }
-
-    private void registerAddxpCommand() {
-        PluginCommand command = pluginRef.getCommand("addxp");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.addxp"));
-        command.setPermission("mcmmo.commands.addxp;mcmmo.commands.addxp.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.3", "addxp", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.XP") + ">"));
-        command.setExecutor(new AddXPCommand(pluginRef));
-    }
-
-    private void registerMmoeditCommand() {
-        PluginCommand command = pluginRef.getCommand("mmoedit");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mmoedit"));
-        command.setPermission("mcmmo.commands.mmoedit;mcmmo.commands.mmoedit.others");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.3", "mmoedit", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Level") + ">"));
-        command.setExecutor(new SkillEditCommand(pluginRef));
-    }
-
-    private void registerMcmmoReloadCommand() {
-        PluginCommand command = pluginRef.getCommand("mcmmoreload");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.mcmmoreload"));
-        command.setPermission("mcmmo.commands.reload");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "mcmmoreload"));
-        command.setExecutor(new ReloadPluginCommand(pluginRef));
     }
 
     private void registerSkillresetCommand() {
@@ -566,12 +577,6 @@ public final class CommandRegistrationManager {
         // Chat Commands
         registerPartyChatCommand();
         registerAdminChatCommand();
-
-        // Experience Commands
-        registerAddlevelsCommand();
-        registerAddxpCommand();
-        registerMmoeditCommand();
-        registerSkillresetCommand();
 
         // Hardcore Commands
         /*registerHardcoreCommand();

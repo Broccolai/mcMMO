@@ -167,6 +167,13 @@ public final class CommandTools {
         return true;
     }
 
+    // TODO
+    public void checkForInvalidSkill(String skillName) {
+        if (!pluginRef.getSkillTools().isSkill(skillName)) {
+            throw new InvalidCommandArgument(pluginRef.getLocaleManager().getString("Commands.Skill.Invalid"));
+        }
+    }
+
     public boolean shouldEnableToggle(String arg) {
         return arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("enabled");
     }

@@ -1,32 +1,33 @@
 package com.gmail.nossr50.commands.server;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
+import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.util.PermissionTools;
+import com.gmail.nossr50.util.commands.CommandTools;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-public class ReloadPluginCommand implements CommandExecutor {
+@Subcommand("mcmmoreload")
+@CommandPermission("mcmmo.commands.reload")
+@Description("%description.mcmmoreload")
+public class ReloadPluginCommand extends BaseCommand {
+    @Dependency
+    private mcMMO pluginRef;
+    @Dependency
+    private CommandTools commandTools;
+    @Dependency
+    private PermissionTools permissionTools;
+    @Dependency
+    private LocaleManager localeManager;
 
-    private final mcMMO pluginRef;
+    @Default
+    public void onCommand(CommandSender sender) {
+        commandTools.hasPermission(permissionTools.reload(sender));
 
-    public ReloadPluginCommand(mcMMO plugin) {
-        this.pluginRef = plugin;
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            if (!pluginRef.getPermissionTools().reload(sender))
-                return false;
-        }
-
-        Bukkit.broadcastMessage(pluginRef.getLocaleManager().getString("Commands.Reload.Start"));
+        Bukkit.broadcastMessage(localeManager.getString("Commands.Reload.Start"));
         pluginRef.reload();
-        Bukkit.broadcastMessage(pluginRef.getLocaleManager().getString("Commands.Reload.Finished"));
-        return true;
+        Bukkit.broadcastMessage(localeManager.getString("Commands.Reload.Finished"));
     }
-
 }

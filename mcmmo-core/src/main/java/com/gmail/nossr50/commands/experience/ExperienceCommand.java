@@ -1,145 +1,81 @@
 package com.gmail.nossr50.commands.experience;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Dependency;
+import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.player.PlayerProfile;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
-import com.gmail.nossr50.mcMMO;
-import com.google.common.collect.ImmutableList;
+import com.gmail.nossr50.locale.LocaleManager;
+import com.gmail.nossr50.util.EventManager;
+import com.gmail.nossr50.util.PermissionTools;
+import com.gmail.nossr50.util.commands.CommandTools;
+import com.gmail.nossr50.util.player.UserManager;
+import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-public abstract class ExperienceCommand implements TabExecutor {
+// TODO: Review this - removed the self targeting syntax because it doesn't work with an ACF structure
+public abstract class ExperienceCommand extends BaseCommand {
+    @Dependency
+    protected CommandTools commandTools;
+    @Dependency
+    protected PermissionTools permissionTools;
+    @Dependency
+    protected SkillTools skillTools;
+    @Dependency
+    protected UserManager userManager;
+    @Dependency
+    protected LocaleManager localeManager;
+    @Dependency
+    protected EventManager eventManager;
+    @Dependency
+    private DatabaseManager databaseManager;
 
-    protected mcMMO pluginRef;
+    @Default
+    @CommandCompletion("@Players @Skills")
+    public void onCommand(CommandSender sender, OfflinePlayer target, PrimarySkillType skill, Integer level) {
+        commandTools.hasPermission(permissionsCheck(sender));
 
-    public ExperienceCommand(mcMMO pluginRef) {
-        this.pluginRef = pluginRef;
-    }
+        if (skill != null && skillTools.isChildSkill(skill)) {
+            throw new InvalidCommandArgument(localeManager.getString("Commands.Skill.ChildSkill"));
+        }
 
-    protected void handleSenderMessage(CommandSender sender, String playerName, PrimarySkillType skill) {
-        if (skill == null) {
-            sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.addlevels.AwardAll.2", playerName));
+        McMMOPlayer mcMMOPlayer = userManager.getOfflinePlayer(target);
+
+        // If the mcMMOPlayer doesn't exist, create a temporary profile and check if it's present in the database. If it's not, abort the process.
+        if (mcMMOPlayer == null) {
+            UUID uuid = target.getUniqueId();
+
+            PlayerProfile profile = databaseManager.loadPlayerProfile(target.getName(), uuid, false);
+
+            if (commandTools.unloadedProfile(sender, profile)) {
+                return;
+            }
+
+            editValues(null, profile, skill, level);
         } else {
-            sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.addlevels.AwardSkill.2", pluginRef.getSkillTools().getLocalizedSkillName(skill), playerName));
+            editValues(mcMMOPlayer.getPlayer(), mcMMOPlayer.getProfile(), skill, level);
+        }
+
+        handleSenderMessage(sender, target.getName(), skill);
+    }
+
+    private void handleSenderMessage(CommandSender sender, String playerName, PrimarySkillType skill) {
+        if (skill == null) {
+            sender.sendMessage(localeManager.getString("Commands.addlevels.AwardAll.2", playerName));
+        } else {
+            sender.sendMessage(localeManager.getString("Commands.addlevels.AwardSkill.2", skillTools.getLocalizedSkillName(skill), playerName));
         }
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        PrimarySkillType skill;
-
-        switch (args.length) {
-            case 2:
-                if (pluginRef.getCommandTools().noConsoleUsage(sender)) {
-                    return true;
-                }
-
-                if (!permissionsCheckSelf(sender)) {
-                    sender.sendMessage(command.getPermissionMessage());
-                    return true;
-                }
-
-                if (!validateArguments(sender, args[0], args[1])) {
-                    return true;
-                }
-
-                skill = pluginRef.getSkillTools().matchSkill(args[0]);
-
-                if (args[1].equalsIgnoreCase("all")) {
-                    skill = null;
-                }
-
-                if (skill != null && pluginRef.getSkillTools().isChildSkill(skill)) {
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Skill.ChildSkill"));
-                    return true;
-                }
-
-                //Profile not loaded
-                if (pluginRef.getUserManager().getPlayer(sender.getName()) == null) {
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Profile.PendingLoad"));
-                    return true;
-                }
-
-
-                editValues((Player) sender, pluginRef.getUserManager().getPlayer(sender.getName()).getProfile(), skill, Integer.parseInt(args[1]));
-                return true;
-
-            case 3:
-                if (!permissionsCheckOthers(sender)) {
-                    sender.sendMessage(command.getPermissionMessage());
-                    return true;
-                }
-
-                if (!validateArguments(sender, args[1], args[2])) {
-                    return true;
-                }
-
-                skill = pluginRef.getSkillTools().matchSkill(args[1]);
-
-                if (args[1].equalsIgnoreCase("all")) {
-                    skill = null;
-                }
-
-                if (skill != null && pluginRef.getSkillTools().isChildSkill(skill)) {
-                    sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Skill.ChildSkill"));
-                    return true;
-                }
-
-                int value = Integer.parseInt(args[2]);
-
-                String playerName = pluginRef.getCommandTools().getMatchedPlayerName(args[0]);
-                McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getOfflinePlayer(playerName);
-
-                // If the mcMMOPlayer doesn't exist, create a temporary profile and check if it's present in the database. If it's not, abort the process.
-                if (mcMMOPlayer == null) {
-                    UUID uuid = null;
-                    OfflinePlayer player = pluginRef.getServer().getOfflinePlayer(playerName);
-                    if (player != null) {
-                        uuid = player.getUniqueId();
-                    }
-                    PlayerProfile profile = pluginRef.getDatabaseManager().loadPlayerProfile(playerName, uuid, false);
-
-                    if (pluginRef.getCommandTools().unloadedProfile(sender, profile)) {
-                        return true;
-                    }
-
-                    editValues(null, profile, skill, value);
-                } else {
-                    editValues(mcMMOPlayer.getPlayer(), mcMMOPlayer.getProfile(), skill, value);
-                }
-
-                handleSenderMessage(sender, playerName, skill);
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                List<String> playerNames = pluginRef.getCommandTools().getOnlinePlayerNames(sender);
-                return StringUtil.copyPartialMatches(args[0], playerNames, new ArrayList<>(playerNames.size()));
-            case 2:
-                return StringUtil.copyPartialMatches(args[1], pluginRef.getSkillTools().LOCALIZED_SKILL_NAMES, new ArrayList<>(pluginRef.getSkillTools().LOCALIZED_SKILL_NAMES.size()));
-            default:
-                return ImmutableList.of();
-        }
-    }
-
-    protected abstract boolean permissionsCheckSelf(CommandSender sender);
-
-    protected abstract boolean permissionsCheckOthers(CommandSender sender);
+    protected abstract boolean permissionsCheck(CommandSender sender);
 
     protected abstract void handleCommand(Player player, PlayerProfile profile, PrimarySkillType skill, int value);
 
@@ -147,13 +83,9 @@ public abstract class ExperienceCommand implements TabExecutor {
 
     protected abstract void handlePlayerMessageSkill(Player player, int value, PrimarySkillType skill);
 
-    private boolean validateArguments(CommandSender sender, String skillName, String value) {
-        return !(pluginRef.getCommandTools().isInvalidInteger(sender, value) || (!skillName.equalsIgnoreCase("all") && pluginRef.getCommandTools().isInvalidSkill(sender, skillName)));
-    }
-
     protected void editValues(Player player, PlayerProfile profile, PrimarySkillType skill, int value) {
         if (skill == null) {
-            for (PrimarySkillType primarySkillType : pluginRef.getSkillTools().NON_CHILD_SKILLS) {
+            for (PrimarySkillType primarySkillType : skillTools.NON_CHILD_SKILLS) {
                 handleCommand(player, profile, primarySkillType, value);
             }
 
