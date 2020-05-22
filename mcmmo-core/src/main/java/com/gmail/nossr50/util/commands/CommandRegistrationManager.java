@@ -353,6 +353,14 @@ public final class CommandRegistrationManager {
     }
 
     /**
+     * Register Skill Reset Command
+     */
+    private void registerSkillresetCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.skillreset", pluginRef.getLocaleManager().getString("Commands.Description.skillreset"));
+        commandManager.registerCommand(new SkillResetCommand());
+    }
+
+    /**
      * Register the NBT Tools command
      */
     private void registerNBTToolsCommand() {
@@ -445,15 +453,6 @@ public final class CommandRegistrationManager {
                     break;
             }
         }
-    }
-
-    private void registerSkillresetCommand() {
-        PluginCommand command = pluginRef.getCommand("skillreset");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.skillreset"));
-        command.setPermission("mcmmo.commands.skillreset;mcmmo.commands.skillreset.others"); // Only need the main ones, not the individual skill ones
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.2", "skillreset", "[" + pluginRef.getLocaleManager().getString("Commands.Usage.Player") + "]", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Skill") + ">"));
-        command.setExecutor(new SkillResetCommand(pluginRef));
     }
 
     private void registerInspectCommand() {

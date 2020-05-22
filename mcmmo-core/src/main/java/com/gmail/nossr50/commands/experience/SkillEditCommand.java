@@ -12,7 +12,12 @@ import org.bukkit.entity.Player;
 @Description("%description.mmoedit")
 public class SkillEditCommand extends ExperienceCommand {
     @Override
-    protected boolean permissionsCheck(CommandSender sender) {
+    protected boolean permissionsCheckSelf(CommandSender sender) {
+        return permissionTools.mmoedit(sender);
+    }
+
+    @Override
+    protected boolean permissionsCheckOthers(CommandSender sender) {
         return permissionTools.mmoeditOthers(sender);
     }
 

@@ -13,7 +13,12 @@ import org.bukkit.entity.Player;
 @Description("%description.addxp")
 public class AddXPCommand extends ExperienceCommand {
     @Override
-    protected boolean permissionsCheck(CommandSender sender) {
+    protected boolean permissionsCheckSelf(CommandSender sender) {
+        return permissionTools.addxp(sender);
+    }
+
+    @Override
+    protected boolean permissionsCheckOthers(CommandSender sender) {
         return permissionTools.addxpOthers(sender);
     }
 

@@ -41,7 +41,11 @@ public abstract class ExperienceCommand extends BaseCommand {
     @Default
     @CommandCompletion("@Players @Skills")
     public void onCommand(CommandSender sender, OfflinePlayer target, PrimarySkillType skill, Integer level) {
-        commandTools.hasPermission(permissionsCheck(sender));
+        if (sender instanceof Player && target.getUniqueId() == ((Player) sender).getUniqueId()) {
+            commandTools.hasPermission(permissionsCheckSelf(sender));
+        } else {
+            commandTools.hasPermission(permissionsCheckOthers(sender));
+        }
 
         if (skill != null && skillTools.isChildSkill(skill)) {
             throw new InvalidCommandArgument(localeManager.getString("Commands.Skill.ChildSkill"));
@@ -75,7 +79,9 @@ public abstract class ExperienceCommand extends BaseCommand {
         }
     }
 
-    protected abstract boolean permissionsCheck(CommandSender sender);
+    protected abstract boolean permissionsCheckSelf(CommandSender sender);
+
+    protected abstract boolean permissionsCheckOthers(CommandSender sender);
 
     protected abstract void handleCommand(Player player, PlayerProfile profile, PrimarySkillType skill, int value);
 

@@ -12,7 +12,12 @@ import org.bukkit.entity.Player;
 @Description("%description.addlevels")
 public class AddLevelsCommand extends ExperienceCommand {
     @Override
-    protected boolean permissionsCheck(CommandSender sender) {
+    protected boolean permissionsCheckSelf(CommandSender sender) {
+        return permissionTools.addlevels(sender);
+    }
+
+    @Override
+    protected boolean permissionsCheckOthers(CommandSender sender) {
         return permissionTools.addlevelsOthers(sender);
     }
 
