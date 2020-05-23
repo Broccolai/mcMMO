@@ -178,6 +178,12 @@ public class mcMMO extends JavaPlugin {
             //Init Scoreboard Manager
             scoreboardManager = new ScoreboardManager(this);
 
+            //Init Chat Manager
+            chatManager = new ChatManager(this);
+
+            //Init Event Manager
+            eventManager = new EventManager(this);
+
             //Init DST
             registerDynamicSettings(); //Do this after configs are loaded
 
@@ -283,14 +289,8 @@ public class mcMMO extends JavaPlugin {
         //Init player level values
         playerLevelTools = new PlayerLevelTools(this);
 
-        //Init Chat Manager
-        chatManager = new ChatManager(this);
-
         //Init Mob Health Bar Manager
         mobHealthBarManager = new MobHealthBarManager(this);
-
-        //Init Event Manager
-        eventManager = new EventManager(this);
 
         //Init Combat Tools
         combatTools = new CombatTools(this);

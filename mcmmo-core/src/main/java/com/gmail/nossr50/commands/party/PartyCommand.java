@@ -63,7 +63,7 @@ public class PartyCommand implements TabExecutor {
         partyInfoCommand = new PartyInfoCommand(pluginRef);
         partyHelpCommand = new PartyHelpCommand(pluginRef);
         partyTeleportCommand = new PtpCommand(pluginRef);
-        partyChatCommand = new PartyChatCommand(pluginRef);
+//        partyChatCommand = new PartyChatCommand(pluginRef);
         partyAllianceCommand = new PartyAllianceCommand(pluginRef);
     }
 

@@ -17,6 +17,7 @@ import com.gmail.nossr50.commands.experience.AddXPCommand;
 import com.gmail.nossr50.commands.experience.SkillEditCommand;
 import com.gmail.nossr50.commands.experience.SkillResetCommand;
 import com.gmail.nossr50.commands.party.PartyCommand;
+import com.gmail.nossr50.commands.party.PartyCommand2;
 import com.gmail.nossr50.commands.party.teleport.PtpCommand;
 import com.gmail.nossr50.commands.player.*;
 import com.gmail.nossr50.commands.server.ReloadPluginCommand;
@@ -41,6 +42,7 @@ import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -83,6 +85,12 @@ public final class CommandRegistrationManager {
         registerPartyChatCommand();
         registerAdminChatCommand();
 
+        // Party Commands
+
+//        registerPartyCommand();
+//        registerPtpCommand();
+        commandManager.registerCommand(new PartyCommand2());
+
         // Experience Commands
         registerAddlevelsCommand();
         registerAddxpCommand();
@@ -100,10 +108,21 @@ public final class CommandRegistrationManager {
      * Register contexts for ACF
      */
     public void registerACFContexts() {
-        commandManager.getCommandContexts().registerOptionalContext(McMMOPlayer.class, c -> {
-            String name = c.popFirstArg();
+        commandManager.getCommandContexts().registerIssuerAwareContext(McMMOPlayer.class, c -> {
+            String playerName;
 
-            String playerName = pluginRef.getCommandTools().getMatchedPlayerName(name);
+            System.out.println(c.getIndex());
+
+            if (c.getIndex() == 0) {
+                Player player = c.getPlayer();
+
+                playerName = player.getName();
+            } else {
+                String input = c.popFirstArg();
+
+                playerName = pluginRef.getCommandTools().getMatchedPlayerName(input);
+            }
+
             McMMOPlayer mcMMOPlayer = pluginRef.getUserManager().getPlayer(playerName);
 
             if (!pluginRef.getCommandTools().checkPlayerExistence(c.getIssuer().getIssuer(), playerName, mcMMOPlayer)) {
@@ -331,14 +350,25 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new ConvertCommand());
     }
 
+    /**
+     * Register Admin Chat Command
+     */
     private void registerAdminChatCommand() {
         commandManager.getCommandReplacements().addReplacement("description.adminchat", pluginRef.getLocaleManager().getString("Commands.Description.adminchat"));
         commandManager.registerCommand(new AdminChatCommand());
     }
 
+    /**
+     * Register Party Chat Command
+     */
     private void registerPartyChatCommand() {
         commandManager.getCommandReplacements().addReplacement("description.partychat", pluginRef.getLocaleManager().getString("Commands.Description.partychat"));
         commandManager.registerCommand(new PartyChatCommand());
+    }
+
+    private void registerPartyJoinCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.adminchat", pluginRef.getLocaleManager().getString("Commands.Description.adminchat"));
+        commandManager.registerCommand(new AdminChatCommand());
     }
 
     /**
@@ -575,10 +605,6 @@ public final class CommandRegistrationManager {
         // Hardcore Commands
         /*registerHardcoreCommand();
         registerVampirismCommand();*/
-
-        // Party Commands
-        registerPartyCommand();
-        registerPtpCommand();
 
         // Player Commands
         registerInspectCommand();
