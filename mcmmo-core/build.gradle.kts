@@ -74,9 +74,3 @@ dependencies {
     implementation("com.sk89q.worldguard:worldguard-legacy:7.0.0-SNAPSHOT")
     testImplementation("junit:junit:4.10")
 }
-
-tasks.create<Copy>("copy") {
-    dependsOn(tasks.named("build"))
-    from("build\\libs\\mcmmo-core-2.2.0-SNAPSHOT-all.jar")
-    into("C:\\Users\\Sakurajima\\IdeaProjects\\Server\\plugins\\update")
-}
