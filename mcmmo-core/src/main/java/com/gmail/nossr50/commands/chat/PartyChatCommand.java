@@ -1,15 +1,22 @@
 package com.gmail.nossr50.commands.chat;
 
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Description;
+import com.gmail.nossr50.commands.exceptions.ProfileNotLoaded;
 import com.gmail.nossr50.datatypes.chat.ChatMode;
 import com.gmail.nossr50.datatypes.party.Party;
 import com.gmail.nossr50.datatypes.party.PartyFeature;
-import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@CommandAlias("partychat")
+@CommandPermission("mcmmo.chat.partychat")
+@Description("%description.partychat")
 public class PartyChatCommand extends ChatCommand {
-    public PartyChatCommand(mcMMO pluginRef) {
-        super(ChatMode.PARTY, pluginRef);
+    public PartyChatCommand() {
+        super(ChatMode.PARTY);
     }
 
     @Override
@@ -18,39 +25,40 @@ public class PartyChatCommand extends ChatCommand {
         String message;
 
         if (sender instanceof Player) {
-            //Check if player profile is loaded
-            if (pluginRef.getUserManager().getPlayer((Player) sender) == null)
-                return;
+            McMMOPlayer mcMMOPlayer = userManager.getPlayer((Player) sender);
 
-            party = pluginRef.getUserManager().getPlayer((Player) sender).getParty();
+            if (mcMMOPlayer == null)
+                throw new ProfileNotLoaded(localeManager);
+
+            party = mcMMOPlayer.getParty();
 
             if (party == null) {
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Commands.Party.None"));
+                sender.sendMessage(localeManager.getString("Commands.Party.None"));
                 return;
             }
 
-            if (party.getLevel() < pluginRef.getPartyManager().getPartyFeatureUnlockLevel(PartyFeature.CHAT)) {
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Party.Feature.Disabled.1"));
+            if (party.getLevel() < partyManager.getPartyFeatureUnlockLevel(PartyFeature.CHAT)) {
+                sender.sendMessage(localeManager.getString("Party.Feature.Disabled.1"));
                 return;
             }
 
             message = buildChatMessage(args, 0);
         } else {
             if (args.length < 2) {
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Party.Specify"));
+                sender.sendMessage(localeManager.getString("Party.Specify"));
                 return;
             }
 
-            party = pluginRef.getPartyManager().getParty(args[0]);
+            party = partyManager.getParty(args[0]);
 
             if (party == null) {
-                sender.sendMessage(pluginRef.getLocaleManager().getString("Party.InvalidName"));
+                sender.sendMessage(localeManager.getString("Party.InvalidName"));
                 return;
             }
 
             message = buildChatMessage(args, 1);
         }
 
-        pluginRef.getChatManager().processPartyChat(party, getDisplayName(sender), message);
+        chatManager.processPartyChat(party, getDisplayName(sender), message);
     }
 }

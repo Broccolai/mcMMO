@@ -1,13 +1,13 @@
 package com.gmail.nossr50.util.commands;
 
 import co.aikar.commands.*;
+import com.gmail.nossr50.chat.ChatManager;
 import com.gmail.nossr50.commands.*;
 import com.gmail.nossr50.commands.admin.NBTToolsCommand;
 import com.gmail.nossr50.commands.admin.PlayerDebugCommand;
 import com.gmail.nossr50.commands.admin.ReloadLocaleCommand;
 import com.gmail.nossr50.commands.chat.AdminChatCommand;
 import com.gmail.nossr50.commands.chat.ChatSpyCommand;
-import com.gmail.nossr50.commands.chat.PartyChatCommand;
 import com.gmail.nossr50.commands.database.McremoveCommand;
 import com.gmail.nossr50.commands.database.PurgeCommand;
 import com.gmail.nossr50.commands.database.ShowDatabaseCommand;
@@ -30,6 +30,7 @@ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.party.PartyManager;
 import com.gmail.nossr50.util.EventManager;
 import com.gmail.nossr50.util.PermissionTools;
 import com.gmail.nossr50.util.StringUtils;
@@ -76,6 +77,10 @@ public final class CommandRegistrationManager {
         registerMcremoveCommand();
         registerMmoshowdbCommand();
         registerMcconvertCommand();
+
+        // Chat Commands
+        registerPartyChatCommand();
+        registerAdminChatCommand();
 
         // Experience Commands
         registerAddlevelsCommand();
@@ -133,6 +138,8 @@ public final class CommandRegistrationManager {
         commandManager.registerDependency(ScoreboardManager.class, pluginRef.getScoreboardManager());
         commandManager.registerDependency(NotificationManager.class, pluginRef.getNotificationManager());
         commandManager.registerDependency(EventManager.class, pluginRef.getEventManager());
+        commandManager.registerDependency(PartyManager.class, pluginRef.getPartyManager());
+        commandManager.registerDependency(ChatManager.class, pluginRef.getChatManager());
 
         // Register Settings
         commandManager.registerDependency(ConfigScoreboard.class, pluginRef.getScoreboardSettings());
@@ -320,6 +327,16 @@ public final class CommandRegistrationManager {
         commandManager.registerCommand(new ConvertCommand());
     }
 
+    private void registerAdminChatCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.adminchat", pluginRef.getLocaleManager().getString("Commands.Description.adminchat"));
+        commandManager.registerCommand(new AdminChatCommand());
+    }
+
+    private void registerPartyChatCommand() {
+        commandManager.getCommandReplacements().addReplacement("description.partychat", pluginRef.getLocaleManager().getString("Commands.Description.partychat"));
+        commandManager.registerCommand(new AdminChatCommand());
+    }
+
     /**
      * Register Add Level Command
      */
@@ -500,28 +517,6 @@ public final class CommandRegistrationManager {
         command.setExecutor(new LeaderboardCommand(pluginRef));
     }
 
-    private void registerAdminChatCommand() {
-        PluginCommand command = pluginRef.getCommand("adminchat");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.adminchat"));
-        command.setPermission("mcmmo.chat.adminchat");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "adminchat"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "adminchat", "<on|off>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "adminchat", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Message") + ">"));
-        command.setExecutor(new AdminChatCommand(pluginRef));
-    }
-
-    private void registerPartyChatCommand() {
-        PluginCommand command = pluginRef.getCommand("partychat");
-        command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.partychat"));
-        command.setPermission("mcmmo.chat.partychat;mcmmo.commands.party");
-        command.setPermissionMessage(permissionsMessage);
-        command.setUsage(pluginRef.getLocaleManager().getString("Commands.Usage.0", "partychat"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "partychat", "<on|off>"));
-        command.setUsage(command.getUsage() + "\n" + pluginRef.getLocaleManager().getString("Commands.Usage.1", "partychat", "<" + pluginRef.getLocaleManager().getString("Commands.Usage.Message") + ">"));
-        command.setExecutor(new PartyChatCommand(pluginRef));
-    }
-
     private void registerPartyCommand() {
         PluginCommand command = pluginRef.getCommand("party");
         command.setDescription(pluginRef.getLocaleManager().getString("Commands.Description.party"));
@@ -573,10 +568,6 @@ public final class CommandRegistrationManager {
     }
 
     public void registerCommands() {
-        // Chat Commands
-        registerPartyChatCommand();
-        registerAdminChatCommand();
-
         // Hardcore Commands
         /*registerHardcoreCommand();
         registerVampirismCommand();*/
