@@ -19,61 +19,20 @@ load: POSTWORLD
 api-version: 1.13
 
 commands:
-    mmoinfo:
-        aliases: [mcinfo]
-        description: Info pages for mcMMO
-        permission: mcmmo.commands.mmoinfo
-    xprate:
-        aliases: [mcxprate]
-        description: Modify the xp rate or start an event
-        permission: mcmmo.commands.xprate
-    mcmmo:
-        description: Shows a brief mod description
-        permission: mcmmo.commands.mcmmo
     mctop:
         description: Show mcMMO leader boards
         permission: mcmmo.commands.mctop
     mcrank:
         description: Show mcMMO ranking for a player
         permission: mcmmo.commands.mcrank
-    addxp:
-        description: Add mcMMO XP to a user
-        permission: mcmmo.commands.addxp
-    addlevels:
-        description: Add mcMMO levels to a user
-        permission: mcmmo.commands.addlevels
-    mcability:
-        description: Toggle whether or not abilities get readied on right click
-        permission: mcmmo.commands.mcability
-    mcrefresh:
-        description: Refresh all cooldowns for mcMMO
-        permission: mcmmo.commands.mcrefresh
     mccooldown:
         description: Show the cooldowns on all your mcMMO abilities
         aliases: [mccooldowns]
         permission: mcmmo.commands.mccooldown
-    mcchatspy:
-        description: Toggle mcMMO Party Chat spying on/off
-        permission: mcmmo.commands.mcchatspy
-    mcgod:
-        description: Toggle mcMMO god-mode on/off
-        permission: mcmmo.commands.mcgod
-    mcimport:
-        description: Import mod config files
-        permission: mcmmo.commands.mcimport
     mcstats:
         aliases: [stats]
         description: Shows your mcMMO stats and xp
         permission: mcmmo.commands.mcstats
-    mcremove:
-        description: Remove a user from the database
-        permission: mcmmo.commands.mcremove
-    mmoedit:
-        description: Edit the mcMMO skill values for a user
-        permission: mcmmo.commands.mmoedit
-    mcmmoreload:
-        description: Reloads mcMMO's config files
-        permission: mcmmo.commands.reload
     ptp:
         description: Teleport to a party member
         permission: mcmmo.commands.ptp
@@ -86,16 +45,6 @@ commands:
     mmoshowdb:
         description: Show the name of the current database type (for later use with /mmoupdate)
         permission: mcmmo.commands.mmoshowdb
-    mcconvert:
-        description: Convert between different database and formula types
-        permission: mcmmo.commands.mcconvert
-    partychat:
-        aliases: [pc, p]
-        description: Toggle Party chat or send party chat messages
-        permission: mcmmo.chat.partychat
-    skillreset:
-        description: Reset the level of one or all of your skills
-        permission: mcmmo.commands.skillreset
     excavation:
         description: Detailed mcMMO skill info
         permission: mcmmo.commands.excavation
@@ -141,20 +90,6 @@ commands:
     salvage:
         description: Detailed mcMMO skill info
         permission: mcmmo.commands.salvage
-    adminchat:
-        aliases: [ac, a]
-        description: Toggle Admin chat or send admin chat messages
-        permission: mcmmo.chat.adminchat
-    mcpurge:
-        description: Purge users with 0 powerlevel and/or who haven't connected in several months from the server DB.
-        permission: mcmmo.commands.mcpurge
-    mcnotify:
-        aliases: [notify]
-        description: Toggle mcMMO abilities chat display notifications on/off
-        permission: mcmmo.commands.mcnotify
-    mhd:
-        description: Sets all players mob health settings to default
-        permission: mcmmo.commands.mhd
     mcscoreboard:
         aliases: [mcsb]
         description: Manage your mcMMO scoreboard

@@ -10,7 +10,7 @@ import com.gmail.nossr50.util.TextComponentFactory;
 import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.entity.Player;
 
-@CommandAlias("mmoinfo")
+@CommandAlias("mmoinfo|mcinfo")
 @Description("%description.mcmmo")
 public class MmoInfoCommand extends BaseCommand {
     @Dependency

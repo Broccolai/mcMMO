@@ -6,7 +6,7 @@ import co.aikar.commands.annotation.Description;
 import com.gmail.nossr50.datatypes.chat.ChatMode;
 import org.bukkit.command.CommandSender;
 
-@CommandAlias("adminchat")
+@CommandAlias("adminchat|ac|a")
 @CommandPermission("mcmmo.chat.adminchat")
 @Description("%description.adminchat")
 public class AdminChatCommand extends ChatCommand {

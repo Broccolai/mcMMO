@@ -11,7 +11,7 @@ import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandAlias("partychat")
+@CommandAlias("partychat|pc|p")
 @CommandPermission("mcmmo.chat.partychat")
 @Description("%description.partychat")
 public class PartyChatCommand extends ChatCommand {

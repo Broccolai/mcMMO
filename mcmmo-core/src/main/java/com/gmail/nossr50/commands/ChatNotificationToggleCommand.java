@@ -9,7 +9,7 @@ import com.gmail.nossr50.locale.LocaleManager;
 import com.gmail.nossr50.util.player.UserManager;
 import org.bukkit.entity.Player;
 
-@CommandAlias("mcnotify")
+@CommandAlias("mcnotify|notify")
 @CommandPermission("mcmmo.commands.mcnotify")
 @Description("%description.mcnotify")
 public class ChatNotificationToggleCommand extends BaseCommand {

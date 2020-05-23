@@ -8,6 +8,7 @@ import com.gmail.nossr50.commands.admin.PlayerDebugCommand;
 import com.gmail.nossr50.commands.admin.ReloadLocaleCommand;
 import com.gmail.nossr50.commands.chat.AdminChatCommand;
 import com.gmail.nossr50.commands.chat.ChatSpyCommand;
+import com.gmail.nossr50.commands.chat.PartyChatCommand;
 import com.gmail.nossr50.commands.database.McremoveCommand;
 import com.gmail.nossr50.commands.database.PurgeCommand;
 import com.gmail.nossr50.commands.database.ShowDatabaseCommand;
@@ -87,6 +88,9 @@ public final class CommandRegistrationManager {
         registerAddxpCommand();
         registerMmoeditCommand();
         registerSkillresetCommand();
+
+        //Config Commands
+        registerMcmmoReloadCommand();
 
         registerNBTToolsCommand();
         registerMmoDebugCommand();
@@ -334,7 +338,7 @@ public final class CommandRegistrationManager {
 
     private void registerPartyChatCommand() {
         commandManager.getCommandReplacements().addReplacement("description.partychat", pluginRef.getLocaleManager().getString("Commands.Description.partychat"));
-        commandManager.registerCommand(new AdminChatCommand());
+        commandManager.registerCommand(new PartyChatCommand());
     }
 
     /**
@@ -586,8 +590,6 @@ public final class CommandRegistrationManager {
         // Skill Commands
         registerSkillCommands();
 
-        //Config Commands
-        registerMcmmoReloadCommand();
         // Admin commands
         registerReloadLocaleCommand();
     }
