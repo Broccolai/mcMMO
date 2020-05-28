@@ -47,11 +47,12 @@ public class PartyCommand implements TabExecutor {
         this.pluginRef = pluginRef;
         initSubCommandList();
 
-        partyJoinCommand = new PartyJoinCommand(pluginRef);
-        partyAcceptCommand = new PartyAcceptCommand(pluginRef);
-        partyCreateCommand = new PartyCreateCommand(pluginRef);
-        partyQuitCommand = new PartyQuitCommand(pluginRef);
-        partyXpShareCommand = new PartyXpShareCommand(pluginRef);
+
+//        partyJoinCommand = new PartyJoinCommand(pluginRef);
+//        partyAcceptCommand = new PartyAcceptCommand(pluginRef);
+//        partyCreateCommand = new PartyCreateCommand(pluginRef);
+//        partyQuitCommand = new PartyQuitCommand(pluginRef);
+//        partyXpShareCommand = new PartyXpShareCommand(pluginRef);
         partyItemShareCommand = new PartyItemShareCommand(pluginRef);
         partyInviteCommand = new PartyInviteCommand(pluginRef);
         partyKickCommand = new PartyKickCommand(pluginRef);

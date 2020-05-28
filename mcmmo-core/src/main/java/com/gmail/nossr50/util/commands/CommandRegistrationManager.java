@@ -28,6 +28,7 @@ import com.gmail.nossr50.core.DynamicSettingsManager;
 import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.datatypes.database.DatabaseType;
 import com.gmail.nossr50.datatypes.experience.FormulaType;
+import com.gmail.nossr50.datatypes.party.ShareMode;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleManager;
@@ -45,6 +46,8 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public final class CommandRegistrationManager {
@@ -203,6 +206,23 @@ public final class CommandRegistrationManager {
             }
 
             return completions;
+        });
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("ShareMode", context -> {
+            List<ShareMode> values = Arrays.asList(ShareMode.values());
+            String exclusion = context.getConfig("exclude", null);
+
+            if (exclusion != null) {
+                values.remove(ShareMode.valueOf(exclusion));
+            }
+
+            List<String> output = new ArrayList<>();
+
+            for (ShareMode mode : values) {
+                output.add(mode.toString());
+            }
+
+            return output;
         });
     }
 
